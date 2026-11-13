@@ -1,0 +1,60 @@
+{
+  "name": "hijri-cli",
+  "version": "0.1.0",
+  "description": "Today's Hijri date and prayer times for Pakistan, in your terminal.",
+  "type": "module",
+  "bin": {
+    "hijri": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli.ts",
+    "lint": "eslint src test && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:update": "UPDATE_GOLDENS=1 vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "hijri",
+    "islamic-calendar",
+    "prayer-times",
+    "ramadan",
+    "pakistan",
+    "cli"
+  ],
+  "author": "Muhammad Shaheer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaheeranser/hijri-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shaheeranser/hijri-cli/issues"
+  },
+  "homepage": "https://github.com/shaheeranser/hijri-cli#readme",
+  "dependencies": {
+    "@clack/prompts": "^1.9.0",
+    "commander": "^15.1.0",
+    "picocolors": "^1.1.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}
