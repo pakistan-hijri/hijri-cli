@@ -101,7 +101,9 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
   only `confirmed` is official when the level is not `confirmed`.
 - **CLI-CARD-5** — WHEN the display date is in Ramadan, THE SYSTEM SHALL label
   Fajr as Sehri ends, label Maghrib as Iftar, show a highlighted Sehri/Iftar
-  line, and allow the next event to be Sehri or Iftar.
+  line, and allow the next event to be Sehri or Iftar. The Fajr and Maghrib rows
+  and the next-event countdown SHALL use the offset-adjusted Sehri/Iftar
+  instants, so the highlighted line and the rows never disagree.
 - **CLI-CARD-6** — The card SHALL end with a short calculated-times disclaimer.
 - **CLI-CARD-7** — WHEN the display date was advanced because the current
   instant is at or after Maghrib, THE SYSTEM SHALL say so on the card.
@@ -123,7 +125,9 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
   nothing else.
 - **CLI-JSON-2** — The success payload SHALL contain `ok: true` and `data` with
   city, profile, Gregorian date, Hijri date and month names, confidence,
-  `afterMaghrib`, six prayer times, `sehriIftar`, and `next`.
+  `afterMaghrib`, six prayer times, `sehriIftar`, and `next`. During Ramadan the
+  `fajr` and `maghrib` entries are the offset-adjusted Sehri and Iftar, matching
+  the card.
 - **CLI-JSON-3** — Prayer times and `next.at` SHALL be `HH:mm` in
   `Asia/Karachi`; `next` SHALL contain the event id, the display time, and
   whole minutes remaining, or SHALL be `null` for an explicit date that is not

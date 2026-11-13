@@ -216,7 +216,9 @@ interface TodayView {
 
 Labels are chosen once in `domain/view.ts`:
 
-- Ramadan: `fajr` → `Sehri ends`, `maghrib` → `Iftar`.
+- Ramadan: `fajr` → `Sehri ends`, `maghrib` → `Iftar`. Those two rows carry the
+  offset-adjusted Sehri and Iftar instants, taken from the same source as the
+  highlighted Sehri/Iftar line, so the label and the time always agree.
 - Otherwise: `Fajr`, `Sunrise`, `Dhuhr`, `Asr`, `Maghrib`, `Isha`.
 - `next.isTomorrow` appends ` (tomorrow)` to the label.
 

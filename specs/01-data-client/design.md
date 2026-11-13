@@ -239,18 +239,29 @@ Rollover rules:
 ```ts
 const PRAYER_IDS = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"] as const;
 
-function orderedEvents(day: PrayerDay): { id: PrayerId; at: string }[];
-function nextEvent(now: Date, day: PrayerDay): NextEvent | null;
+interface ScheduleContext {
+  meta: PrayerMeta;
+  month: number;
+}
+
+function orderedEvents(day: PrayerDay, context?: ScheduleContext): { id: PrayerId; at: string }[];
+function nextEvent(now: Date, day: PrayerDay, context?: ScheduleContext): NextEvent | null;
 function sehriIftar(day: PrayerDay, meta: PrayerMeta, month: number): SehriIftar | null;
 ```
 
-- `orderedEvents` reads the six ISO instants in canonical order.
+- `orderedEvents` reads the six ISO instants in canonical order. When the
+  context is Ramadan, the Fajr and Maghrib instants are the offset-adjusted
+  Sehri and Iftar; every other instant is unchanged.
 - `nextEvent` returns the first instant strictly after `now`, with
   `minutes = max(0, ceil((at - now) / 60000))`. It returns `null` when the whole
   day has passed; the command then asks for the next day's Fajr, loading the
-  next Gregorian year when required.
+  next Gregorian year when required. Because it reads `orderedEvents`, the next
+  event during Ramadan is the adjusted Sehri or Iftar, so the countdown matches
+  the value on screen.
 - `sehriIftar` returns `null` outside Ramadan. Inside Ramadan it adds the
-  published offsets to Fajr and Maghrib. The Jafari profile's `-10` Sehri offset
+  published offsets to Fajr and Maghrib, and is built from the same
+  `eventInstant` helper as `orderedEvents`, so the summary line, the prayer rows,
+  and the next event can never disagree. The Jafari profile's `-10` Sehri offset
   is therefore applied exactly as the API intends.
 - The module returns instants and ids only. `src/render/time.ts` owns 12/24-hour
   formatting and countdown text.
