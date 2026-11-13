@@ -1,0 +1,46 @@
+name: Bug report
+description: Report something that is broken or wrong
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. For wrong dates or prayer times, include the city,
+        profile, and confidence level shown by the CLI — the underlying data lives
+        in `shaheeranser/hijri-api`.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Output of `hijri --version`, or the commit you built from.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and configuration
+      description: The exact command, plus saved city/profile if relevant.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include the card, `--plain`, or `--json` output. Redact anything personal.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, terminal, and Node version.
+    validations:
+      required: true

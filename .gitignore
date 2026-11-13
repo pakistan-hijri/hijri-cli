@@ -1,0 +1,26 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+
+# Logs and local artifacts
+*.log
+npm-debug.log*
+
+# Planning notes: uncommitted, distinct from the committed specs/ directory
+/docs/
+
+# Agent and editor local state
+/.commandcode/
+/.neatcode.json
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
