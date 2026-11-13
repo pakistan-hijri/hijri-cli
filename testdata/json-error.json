@@ -1,0 +1,7 @@
+{
+  "ok": false,
+  "error": {
+    "code": "network",
+    "message": "Could not reach example.test."
+  }
+}
