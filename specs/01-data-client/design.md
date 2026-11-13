@@ -122,11 +122,14 @@ interface CacheDeps {
 }
 
 class FileCache {
-  getFresh(url: string, ttlMs: number): Promise<unknown | undefined>;
-  getStale(url: string): Promise<unknown | undefined>;
+  getFresh(url: string, ttlMs: number): Promise<CachedEntry | undefined>;
+  getStale(url: string): Promise<CachedEntry | undefined>;
   set(url: string, body: unknown): Promise<void>;
 }
 ```
+
+`CachedEntry` pairs the stored `body` with the `fetchedAt` instant, so callers
+can report freshness without re-reading the envelope.
 
 - `getFresh` returns `undefined` for a missing, invalid, or expired envelope.
 - `getStale` returns any valid envelope regardless of age.

@@ -114,12 +114,14 @@ src/
     view.ts              assemble the TodayView view model
     types.ts             domain types shared by command/render
   render/
+    writer.ts            Writer sink: stdout for results, stderr for diagnostics
     time.ts              ISO → 12/24-hour display, countdown text
     theme.ts             colour decisions, NO_COLOR aware
     today.ts             card and plain renderers
     json.ts              stable JSON payload and JSON error payload
   onboard/
     prompts.ts           city/profile prompts; returns a config patch
+    flow.ts              shared onboarding sequence used by today and setup
   errors.ts              CliError and exit-code mapping
   version.ts             package version string
 ```

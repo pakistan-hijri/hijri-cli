@@ -124,8 +124,8 @@ Flow:
 1. Fetch `/cities.json` once.
 2. Intro line.
 3. City select, showing `name — province` and returning the id.
-4. Profile select, default `sunni_hanafi`; labels `Sunni (Hanafi)`,
-   `Sunni (Asr: Shafi'i)`, `Shia (Jafari)`.
+4. Profile select, default `sunni_hanafi`; labels come from the API contract
+   (`Sunni (Hanafi)`, `Sunni (earlier Asr)`, `Shia (Jafari)`).
 5. Validate the pair.
 6. Save atomically.
 7. For first-run, continue into the today view with the new settings.
