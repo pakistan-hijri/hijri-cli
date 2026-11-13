@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/cli.ts",
-    "lint": "eslint src test && tsc --noEmit",
+    "lint": "eslint --no-error-on-unmatched-pattern src test && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:update": "UPDATE_GOLDENS=1 vitest run",
