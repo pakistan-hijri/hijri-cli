@@ -9,8 +9,10 @@ import type {
   PrayerMeta,
   SehriIftar,
 } from "./types.js";
-import { PRAYER_IDS } from "./types.js";
-import { sehriIftar as calculateSehriIftar } from "./schedule.js";
+import {
+  orderedEvents,
+  sehriIftar as calculateSehriIftar,
+} from "./schedule.js";
 
 export const DISCLAIMER = "Calculated times; verify locally.";
 
@@ -57,6 +59,10 @@ export interface BuildViewInput {
 export function buildTodayView(input: BuildViewInput): TodayView {
   const ramadan = input.hijri.month === 9;
   const sehriIftar = calculateSehriIftar(input.prayer, input.meta, input.hijri.month);
+  const events = orderedEvents(input.prayer, {
+    meta: input.meta,
+    month: input.hijri.month,
+  });
 
   return {
     city: input.city,
@@ -72,10 +78,10 @@ export function buildTodayView(input: BuildViewInput): TodayView {
     confidence: input.hijri.confidence,
     afterMaghrib: input.afterMaghrib,
     ramadan,
-    prayers: PRAYER_IDS.map((id) => ({
-      id,
-      label: eventLabel(id, ramadan, false),
-      at: input.prayer.times[id],
+    prayers: events.map((event) => ({
+      id: event.id,
+      label: eventLabel(event.id, ramadan, false),
+      at: event.at,
     })),
     sehriIftar,
     next: input.next

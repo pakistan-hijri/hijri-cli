@@ -36,6 +36,21 @@ describe("nextEvent", () => {
     const event = nextEvent(new Date("2026-11-13T12:15:01+05:00"), day);
     expect(event).toMatchObject({ id: "dhuhr", minutes: 1 });
   });
+
+  it("uses the offset-adjusted Sehri during Ramadan", () => {
+    const ramadanDay = prayerDay("2027-02-08", {
+      fajr: "2027-02-08T06:02:00+05:00",
+    });
+    const event = nextEvent(
+      new Date("2027-02-08T05:00:00+05:00"),
+      ramadanDay,
+      { meta: prayerMeta({ sehriOffsetMin: -10 }), month: 9 },
+    );
+    expect(event).toMatchObject({
+      id: "fajr",
+      at: addMinutes(ramadanDay.times.fajr, -10),
+    });
+  });
 });
 
 describe("sehriIftar", () => {

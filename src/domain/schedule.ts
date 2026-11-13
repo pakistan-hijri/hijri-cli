@@ -14,13 +14,25 @@ export interface PrayerEvent {
   at: string;
 }
 
-export function orderedEvents(day: PrayerDay): PrayerEvent[] {
-  return PRAYER_IDS.map((id) => ({ id, at: day.times[id] }));
+export interface ScheduleContext {
+  meta: PrayerMeta;
+  month: number;
 }
 
-export function nextEvent(now: Date, day: PrayerDay): NextEvent | null {
+export function orderedEvents(
+  day: PrayerDay,
+  context?: ScheduleContext,
+): PrayerEvent[] {
+  return PRAYER_IDS.map((id) => ({ id, at: eventInstant(day, id, context) }));
+}
+
+export function nextEvent(
+  now: Date,
+  day: PrayerDay,
+  context?: ScheduleContext,
+): NextEvent | null {
   const nowMs = now.getTime();
-  for (const event of orderedEvents(day)) {
+  for (const event of orderedEvents(day, context)) {
     const atMs = new Date(event.at).getTime();
     if (Number.isNaN(atMs) || atMs <= nowMs) {
       continue;
@@ -42,10 +54,28 @@ export function sehriIftar(
   if (month !== 9) {
     return null;
   }
+  const context: ScheduleContext = { meta, month };
   return {
-    sehriEnds: addMinutes(day.times.fajr, meta.sehriOffsetMin),
-    iftar: addMinutes(day.times.maghrib, meta.iftarOffsetMin),
+    sehriEnds: eventInstant(day, "fajr", context),
+    iftar: eventInstant(day, "maghrib", context),
   };
+}
+
+function eventInstant(
+  day: PrayerDay,
+  id: PrayerId,
+  context: ScheduleContext | undefined,
+): string {
+  if (context === undefined || context.month !== 9) {
+    return day.times[id];
+  }
+  if (id === "fajr") {
+    return addMinutes(day.times.fajr, context.meta.sehriOffsetMin);
+  }
+  if (id === "maghrib") {
+    return addMinutes(day.times.maghrib, context.meta.iftarOffsetMin);
+  }
+  return day.times[id];
 }
 
 export function addMinutes(iso: string, minutes: number): string {

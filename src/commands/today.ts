@@ -132,7 +132,10 @@ export async function runToday(
     null;
 
   if (showNext) {
-    const current = nextEvent(now, prayer.day);
+    const current = nextEvent(now, prayer.day, {
+      meta: prayer.meta,
+      month: hijri.month,
+    });
     if (current !== null) {
       next = {
         ...current,
@@ -145,7 +148,10 @@ export async function runToday(
         deps.api.prayerDay(config.city, config.profile, tomorrowDate),
         deps.api.calendarDay(tomorrowDate),
       ]);
-      const tomorrow = nextEvent(now, tomorrowPrayer.day);
+      const tomorrow = nextEvent(now, tomorrowPrayer.day, {
+        meta: tomorrowPrayer.meta,
+        month: tomorrowHijri.month,
+      });
       if (tomorrow !== null) {
         next = {
           ...tomorrow,
