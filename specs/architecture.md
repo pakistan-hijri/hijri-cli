@@ -9,7 +9,7 @@ milestones share.
 A Pakistani user wants two things from one command: today's Hijri date and
 today's prayer times, including Sehri and Iftar during Ramadan. The dates and
 times must be trustworthy, auditable, and honest about uncertainty. The CLI is a
-reader of [`hijri-api`](https://github.com/shaheeranser/hijri-api), not a second
+reader of [`hijri-api`](https://github.com/pakistan-hijri/hijri-api), not a second
 source of truth.
 
 Goals:
@@ -29,7 +29,7 @@ Non-goals:
 
 ## 2. Data source contract
 
-Base URL: `https://shaheeranser.github.io/hijri-api`, overridable with
+Base URL: `https://pakistan-hijri.github.io/hijri-api`, overridable with
 `HIJRI_API_BASE_URL` for local or alternate builds. All routes are `GET` and
 serve JSON.
 

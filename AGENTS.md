@@ -107,7 +107,7 @@ Two invariants are easy to break:
 - Deterministic and offline: fake `fetch`, freeze the clock, and use temporary
   config/cache directories. No live API calls in unit tests.
 - Bug fixes include a regression test that fails before the fix.
-- A live smoke against `https://shaheeranser.github.io/hijri-api` is a manual
+- A live smoke against `https://pakistan-hijri.github.io/hijri-api` is a manual
   verification step, never part of the test suite or CI.
 
 ## Commit hygiene

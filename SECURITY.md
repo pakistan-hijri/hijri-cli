@@ -16,7 +16,7 @@ reproduce against it before reporting.
 Please **do not open a public issue** for a security problem.
 
 Use GitHub's private vulnerability reporting on this repository:
-[Report a vulnerability](https://github.com/shaheeranser/hijri-cli/security/advisories/new).
+[Report a vulnerability](https://github.com/pakistan-hijri/hijri-cli/security/advisories/new).
 If that form is unavailable, email shaheer.anser@gmail.com with `hijri-cli
 security` in the subject.
 
@@ -45,5 +45,5 @@ cache files. The following areas are worth looking at:
   future version must not log, cache, or echo them.
 
 Out of scope: the accuracy or official status of dates and prayer times. Those
-are data-quality issues for [`hijri-api`](https://github.com/shaheeranser/hijri-api),
+are data-quality issues for [`hijri-api`](https://github.com/pakistan-hijri/hijri-api),
 not security vulnerabilities in this CLI.

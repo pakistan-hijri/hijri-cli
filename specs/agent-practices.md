@@ -58,7 +58,7 @@ the committed, normative documentation.
 ## 6. Validate against the real API
 
 Green unit tests are necessary but not sufficient. A run is validated by driving
-the built CLI against `https://shaheeranser.github.io/hijri-api` at least once:
+the built CLI against `https://pakistan-hijri.github.io/hijri-api` at least once:
 today's date, a Ramadan date, and the `--json` output. Record the commands and
 the result in the run report.
 

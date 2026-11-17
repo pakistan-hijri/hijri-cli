@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for the report. For wrong dates or prayer times, include the city,
         profile, and confidence level shown by the CLI — the underlying data lives
-        in `shaheeranser/hijri-api`.
+        in `pakistan-hijri/hijri-api`.
   - type: input
     id: version
     attributes:
