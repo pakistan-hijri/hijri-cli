@@ -5,7 +5,7 @@ Today's Hijri date and prayer times for Pakistan, in your terminal.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `hijri-cli` is a small, scriptable CLI built on
-[`hijri-api`](https://github.com/shaheeranser/hijri-api). It shows the Hijri
+[`hijri-api`](https://github.com/pakistan-hijri/hijri-api). It shows the Hijri
 date, the day's prayer times, the next prayer, and — during Ramadan — Sehri and
 Iftar. Dates and times come from a static JSON API that records confirmed month
 starts and calculates prayer times for Pakistani cities.
@@ -147,7 +147,7 @@ final authority. Sehri and Iftar use the same Fajr and Maghrib calculations with
 the profile's precaution offsets.
 
 The data contract, confidence model, source record, and audit trail live in
-[`hijri-api`](https://github.com/shaheeranser/hijri-api). This CLI does not
+[`hijri-api`](https://github.com/pakistan-hijri/hijri-api). This CLI does not
 maintain a second copy of any date or time.
 
 ## Roadmap

@@ -12,6 +12,7 @@
   "engines": {
     "node": ">=22"
   },
+  "defaultCommand": "dev",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/cli.ts",

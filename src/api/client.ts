@@ -35,7 +35,7 @@ const TTL = {
   prayer: 30 * 24 * 60 * 60 * 1000,
 } as const;
 
-export const DEFAULT_BASE_URL = "https://shaheeranser.github.io/hijri-api";
+export const DEFAULT_BASE_URL = "https://pakistan-hijri.github.io/hijri-api";
 
 export interface ApiDeps {
   baseUrl?: string;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FileCache } from "../../src/api/cache.js";
-import { HijriApi } from "../../src/api/client.js";
+import { DEFAULT_BASE_URL, HijriApi } from "../../src/api/client.js";
 import {
   DataError,
   DataUnavailableError,
@@ -140,6 +140,10 @@ function fakeFetch(table: Map<string, () => Response>): typeof fetch {
 }
 
 describe("HijriApi", () => {
+  it("uses the canonical API host by default", () => {
+    expect(DEFAULT_BASE_URL).toBe("https://pakistan-hijri.github.io/hijri-api");
+  });
+
   it("validates and maps the city list", async () => {
     const dir = await tempDir();
     const api = createApi(dir.path, fakeFetch(routes()));

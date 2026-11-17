@@ -296,7 +296,7 @@ Success goes to stdout. Errors go to stderr as:
   "ok": false,
   "error": {
     "code": "network",
-    "message": "Could not reach shaheeranser.github.io. Check your connection and try again."
+    "message": "Could not reach pakistan-hijri.github.io. Check your connection and try again."
   }
 }
 ```
