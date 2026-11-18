@@ -4,6 +4,7 @@
 import { Command, CommanderError } from "commander";
 import { FileCache } from "./api/cache.js";
 import { DEFAULT_BASE_URL, HijriApi } from "./api/client.js";
+import { runCalendar } from "./commands/calendar.js";
 import { runConfig } from "./commands/config.js";
 import { runSetup } from "./commands/setup.js";
 import { runToday } from "./commands/today.js";
@@ -28,6 +29,16 @@ interface CliOptions {
   color?: boolean;
   cache?: boolean;
   offline?: boolean;
+}
+
+interface CalendarCliOptions {
+  month?: string;
+  year?: string;
+  city?: string;
+  profile?: string;
+  "24h"?: boolean;
+  json?: boolean;
+  plain?: boolean;
 }
 
 async function main(): Promise<void> {
@@ -94,6 +105,7 @@ Examples:
   $ hijri
   $ hijri --city lahore --24h
   $ hijri --date 2026-03-01 --json
+  $ hijri calendar --month 9 --year 1448
   $ hijri setup
   $ hijri config --city lahore --profile shia_jafari
 `,
@@ -145,6 +157,47 @@ Examples:
       );
     });
 
+  program
+    .command("calendar")
+    .description("show a Hijri month calendar")
+    .option("--month <1-12>", "Hijri month number")
+    .option("--year <year>", "Hijri year")
+    .option("--city <id>", "one-off city lookup")
+    .option("--profile <id>", "one-off prayer profile")
+    .option("--24h", "use 24-hour times")
+    .option("--json", "print machine-readable JSON")
+    .option("--plain", "print plain text without a card")
+    .action(async (local: CalendarCliOptions) => {
+      const root = program.opts<CliOptions>();
+      const api = createApi(root, writer.err);
+      const city = pick(local.city, root.city);
+      const profile = pick(local.profile, root.profile);
+      await runCalendar(
+        {
+          ...(local.month === undefined ? {} : { month: local.month }),
+          ...(local.year === undefined ? {} : { year: local.year }),
+          ...(city === undefined ? {} : { city }),
+          ...(profile === undefined ? {} : { profile }),
+          h24: pick(local["24h"], root["24h"]) === true,
+          json: pick(local.json, root.json) === true,
+          plain: pick(local.plain, root.plain) === true,
+        },
+        {
+          api,
+          configPath,
+          prompts: createClackPrompts(),
+          writer,
+          now: () => new Date(),
+          isTTY,
+          colorEnabled:
+            root.color !== false &&
+            Boolean(process.stdout.isTTY) &&
+            process.env.NO_COLOR === undefined,
+          unicode: supportsUnicode(process.env),
+        },
+      );
+    });
+
   try {
     await program.parseAsync(process.argv);
   } catch (error) {
@@ -178,6 +231,10 @@ function describeCause(cause: unknown): string {
   } catch {
     return "Unknown cause";
   }
+}
+
+function pick<T>(local: T | undefined, root: T | undefined): T | undefined {
+  return local === undefined ? root : local;
 }
 
 function createApi(
