@@ -117,6 +117,16 @@ describe("human renderers", () => {
     );
   });
 
+  it("right-aligns and isolates the Urdu month name", () => {
+    const lines = renderCard(sampleView(), options).split("\n");
+    const urdu = lines.find((line) => line.includes("\u2068"));
+    expect(urdu?.endsWith("\u2068جمادی الثانی\u2069")).toBe(true);
+    expect(urdu?.replace(/[\u2068\u2069]/gu, "").length).toBe(40);
+    expect(renderCard(sampleView(), { ...options, ascii: true })).not.toContain(
+      "\u2068",
+    );
+  });
+
   it("renders the explicit-date note", async () => {
     const view = sampleView({
       gregorian: "2026-11-14",

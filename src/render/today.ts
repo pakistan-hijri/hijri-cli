@@ -8,6 +8,10 @@ import { formatCountdown, formatTime, formatWeekday } from "./time.js";
 
 const RULE_WIDTH = 40;
 
+const RTL_ISOLATE_START = "\u2068";
+const RTL_ISOLATE_END = "\u2069";
+const ZERO_WIDTH = /\u200c|\u200d|[\u200e\u200f\u202a-\u202e\u2066-\u2069]|\p{M}/gu;
+
 export interface RenderOptions {
   format: TimeFormat;
   color: boolean;
@@ -22,7 +26,7 @@ export function renderCard(view: TodayView, options: RenderOptions): string {
     `${theme.bold("Hijri")}${separator}${view.city.name}`,
     rule,
     formatWeekday(view.gregorian),
-    hijriLine(view, options.ascii),
+    ...hijriLines(view, options.ascii),
   ];
 
   if (view.afterMaghrib) {
@@ -63,7 +67,7 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   const lines = [
     `Hijri${separator}${view.city.name}`,
     formatWeekday(view.gregorian),
-    hijriLine(view, options.ascii),
+    ...hijriLines(view, options.ascii),
     `Confidence: ${view.confidence}`,
   ];
 
@@ -88,9 +92,25 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   return `${lines.join("\n")}\n`;
 }
 
-function hijriLine(view: TodayView, ascii: boolean): string {
+function hijriLines(view: TodayView, ascii: boolean): string[] {
   const base = `${view.hijri.day} ${view.hijri.monthName.en} ${view.hijri.year} AH`;
-  return ascii ? base : `${base} · ${view.hijri.monthName.ur}`;
+  if (ascii) {
+    return [base];
+  }
+  return [base, rightAlign(rtl(view.hijri.monthName.ur))];
+}
+
+function rtl(text: string): string {
+  return `${RTL_ISOLATE_START}${text}${RTL_ISOLATE_END}`;
+}
+
+function rightAlign(text: string): string {
+  const padding = Math.max(0, RULE_WIDTH - displayWidth(text));
+  return `${" ".repeat(padding)}${text}`;
+}
+
+function displayWidth(text: string): number {
+  return [...text.replace(ZERO_WIDTH, "")].length;
 }
 
 function nextLine(view: TodayView): string {
