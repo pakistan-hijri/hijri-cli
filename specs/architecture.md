@@ -220,7 +220,8 @@ described in the README.
   `--no-color` was not passed. Confidence and Ramadan labels carry meaning in
   words, so colour is never the only channel.
 - **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm`.
-- **Dates** are shown in English plus the API's Urdu month name.
+- **Dates** are shown in English plus the API's Urdu month name on a separate
+  right-aligned, bidi-isolated line; the ASCII fallback omits the Urdu line.
 - **Confidence** is always printed. Anything other than `confirmed` says it is
   not an official announcement.
 - **Disclaimer:** the card ends with a short calculated-times notice.

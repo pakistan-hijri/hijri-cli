@@ -111,6 +111,10 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
   `NO_COLOR` is unset and `--no-color` was not passed.
 - **CLI-CARD-9** — WHEN Unicode is unavailable, THE SYSTEM SHALL fall back to
   ASCII labels and plain rules; meaning SHALL never depend on colour.
+- **CLI-CARD-10** — The Urdu month name SHALL be rendered on its own line,
+  right-aligned to the card width and wrapped in Unicode bidi isolates so
+  mixed-direction text keeps its intended order. The ASCII fallback SHALL omit
+  that line.
 
 ### 3.6 Plain text
 

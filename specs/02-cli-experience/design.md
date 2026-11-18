@@ -249,7 +249,8 @@ function formatWeekday(date: string): string;
 Hijri · Karachi
 ────────────────────────────────────────
 Friday, 13 November 2026
-2 Jumada al-Thani 1448 AH · جمادی الثانی
+2 Jumada al-Thani 1448 AH
+                            ⁨جمادی الثانی⁩
 Next: Maghrib in 2h 14m
 
 Fajr       5:28 AM
@@ -275,7 +276,11 @@ Rules:
 - Next line is omitted for an explicit date; instead the card prints
   `Date lookup: no countdown.`
 - `--no-color` and `NO_COLOR` produce the same text without ANSI codes.
-- The ASCII fallback omits the Urdu name and uses `-` rules.
+- The Urdu name is a separate line, right-aligned to the 40-column width and
+  wrapped in FSI/PDI isolates (U+2068/U+2069), so a bidi-aware terminal cannot
+  pull the date line's punctuation into the RTL run. Display width ignores
+  bidi controls, joiners, and combining marks.
+- The ASCII fallback omits the Urdu line and uses `-` rules.
 
 ### 7.3 Plain
 
