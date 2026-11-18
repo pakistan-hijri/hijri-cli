@@ -1,0 +1,198 @@
+{
+  "ok": true,
+  "data": {
+    "city": "karachi",
+    "profile": "sunni_hanafi",
+    "year": 1448,
+    "month": 6,
+    "monthName": {
+      "en": "Jumada al-Thani",
+      "ur": "جمادی الثانی"
+    },
+    "ramadan": false,
+    "confidence": "confirmed",
+    "today": "1448-06-02",
+    "days": [
+      {
+        "hijri": "1448-06-01",
+        "day": 1,
+        "gregorian": "2026-05-28",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-02",
+        "day": 2,
+        "gregorian": "2026-05-29",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-03",
+        "day": 3,
+        "gregorian": "2026-05-30",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-04",
+        "day": 4,
+        "gregorian": "2026-05-31",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-05",
+        "day": 5,
+        "gregorian": "2026-06-01",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-06",
+        "day": 6,
+        "gregorian": "2026-06-02",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-07",
+        "day": 7,
+        "gregorian": "2026-06-03",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-08",
+        "day": 8,
+        "gregorian": "2026-06-04",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-09",
+        "day": 9,
+        "gregorian": "2026-06-05",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-10",
+        "day": 10,
+        "gregorian": "2026-06-06",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-11",
+        "day": 11,
+        "gregorian": "2026-06-07",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-12",
+        "day": 12,
+        "gregorian": "2026-06-08",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-13",
+        "day": 13,
+        "gregorian": "2026-06-09",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-14",
+        "day": 14,
+        "gregorian": "2026-06-10",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-15",
+        "day": 15,
+        "gregorian": "2026-06-11",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-16",
+        "day": 16,
+        "gregorian": "2026-06-12",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-17",
+        "day": 17,
+        "gregorian": "2026-06-13",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-18",
+        "day": 18,
+        "gregorian": "2026-06-14",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-19",
+        "day": 19,
+        "gregorian": "2026-06-15",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-20",
+        "day": 20,
+        "gregorian": "2026-06-16",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-21",
+        "day": 21,
+        "gregorian": "2026-06-17",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-22",
+        "day": 22,
+        "gregorian": "2026-06-18",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-23",
+        "day": 23,
+        "gregorian": "2026-06-19",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-24",
+        "day": 24,
+        "gregorian": "2026-06-20",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-25",
+        "day": 25,
+        "gregorian": "2026-06-21",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-26",
+        "day": 26,
+        "gregorian": "2026-06-22",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-27",
+        "day": 27,
+        "gregorian": "2026-06-23",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-28",
+        "day": 28,
+        "gregorian": "2026-06-24",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-29",
+        "day": 29,
+        "gregorian": "2026-06-25",
+        "confidence": "confirmed"
+      },
+      {
+        "hijri": "1448-06-30",
+        "day": 30,
+        "gregorian": "2026-06-26",
+        "confidence": "confirmed"
+      }
+    ]
+  }
+}
