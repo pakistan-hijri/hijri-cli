@@ -1,22 +1,18 @@
 /** `hijri`: resolve today, build the view, and choose one renderer. */
 
-import { DEFAULT_CONFIG, loadConfig, resolveConfig, saveConfig } from "../config/config.js";
 import {
   addDays,
   isValidIsoDate,
   resolveDisplayDate,
   todayInPakistan,
 } from "../domain/calendar.js";
-import type { Convention } from "../domain/types.js";
-import type { ProfileId } from "../domain/profiles.js";
-import { isProfileId, PROFILE_IDS } from "../domain/profiles.js";
 import { nextEvent } from "../domain/schedule.js";
 import type { NextEvent } from "../domain/types.js";
 import { buildTodayView } from "../domain/view.js";
-import { CancelledError, DataUnavailableError, UsageError } from "../errors.js";
+import { DataUnavailableError, UsageError } from "../errors.js";
 import type { HijriApi } from "../api/client.js";
 import type { OnboardPrompts } from "../onboard/prompts.js";
-import { runOnboarding } from "../onboard/flow.js";
+import { loadRunSettings, parseConvention, parseProfile } from "./settings.js";
 import { renderJsonSuccess } from "../render/json.js";
 import { renderCard, renderPlain } from "../render/today.js";
 import type { Writer } from "../render/writer.js";
@@ -50,47 +46,19 @@ export async function runToday(
   flags: TodayFlags,
   deps: TodayDeps,
 ): Promise<void> {
-  if (flags.midnight === true && flags.afterMaghrib === true) {
-    throw new UsageError("Use either --midnight or --after-maghrib, not both.");
-  }
-
-  const loaded = await loadConfig(deps.configPath);
-  let saved = loaded.config;
-
-  if (saved === undefined) {
-    if (deps.isTTY) {
-      const cities = await deps.api.cities();
-      const result = await runOnboarding(cities, deps.prompts);
-      if (result === null) {
-        throw new CancelledError();
-      }
-      saved = {
-        ...DEFAULT_CONFIG,
-        city: result.city,
-        profile: result.profile,
-      };
-      await saveConfig(deps.configPath, saved);
-    } else {
-      deps.writer.err(
-        "No saved configuration; using Karachi and sunni_hanafi. Run \"hijri setup\" to choose.\n",
-      );
-    }
-  }
-
   const profile = parseProfile(flags.profile);
   if (flags.city !== undefined) {
     await deps.api.requireCity(flags.city);
   }
-
   const convention = parseConvention(flags);
-  const config = resolveConfig(
+  const config = await loadRunSettings(
     {
       ...(flags.city === undefined ? {} : { city: flags.city }),
       ...(profile === undefined ? {} : { profile }),
       ...(convention === undefined ? {} : { convention }),
       ...(flags.h24 === true ? { timeFormat: "24h" as const } : {}),
     },
-    saved,
+    deps,
   );
 
   if (flags.date !== undefined && !isValidIsoDate(flags.date)) {
@@ -196,26 +164,4 @@ export async function runToday(
       ? renderPlain(view, humanOptions)
       : renderCard(view, humanOptions),
   );
-}
-
-function parseProfile(value: string | undefined): ProfileId | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  if (!isProfileId(value)) {
-    throw new UsageError(
-      `Unknown profile "${value}". Accepted profiles: ${PROFILE_IDS.join(", ")}.`,
-    );
-  }
-  return value;
-}
-
-function parseConvention(flags: TodayFlags): Convention | undefined {
-  if (flags.midnight === true) {
-    return "midnight";
-  }
-  if (flags.afterMaghrib === true) {
-    return "after-maghrib";
-  }
-  return undefined;
 }
