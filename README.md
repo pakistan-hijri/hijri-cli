@@ -46,6 +46,9 @@ hijri                          # today's date and prayer times
 hijri --city lahore            # one-off city, does not change saved config
 hijri --profile shia_jafari    # one-off prayer profile
 hijri --date 2026-03-01        # look up a specific civil date
+hijri calendar                 # current Hijri month grid
+hijri calendar --month 9       # a specific Hijri month
+hijri calendar --year 1449     # a full Hijri year's month
 hijri --midnight               # do not roll the Hijri date over at Maghrib
 hijri --24h                    # 24-hour times
 hijri --json                   # stable JSON for scripts
@@ -60,6 +63,23 @@ hijri config --clear           # remove saved configuration
 During Ramadan the card labels Fajr as **Sehri ends** and Maghrib as **Iftar**,
 adds a highlighted Sehri/Iftar line, and makes the next event a Sehri or Iftar
 countdown. Outside Ramadan those rows read as ordinary Fajr and Maghrib.
+
+### Calendar
+
+`hijri calendar` prints the Hijri month as a Monday-first grid. Each week shows
+the Hijri day numbers above the matching Gregorian day numbers, with the full
+Gregorian range in the header. The resolved current day is marked `*` and
+Ramadan months explain that Sehri ends at Fajr and Iftar at Maghrib. Dates still
+come from `hijri-api`; the CLI computes no calendar of its own.
+
+```sh
+hijri calendar --month 9 --year 1448 --json
+```
+
+`--plain` drops the card decoration. `--24h` is accepted for consistency but the
+calendar contains no times. All dates come from the published calendar files,
+and a month whose dates are not all confirmed carries the same warning as the
+today view.
 
 ### Date convention
 
@@ -136,6 +156,32 @@ Environment overrides:
 }
 ```
 
+`hijri calendar --json` uses the same envelope with a month payload:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "city": "karachi",
+    "profile": "sunni_hanafi",
+    "year": 1448,
+    "month": 9,
+    "monthName": { "en": "Ramadan", "ur": "رمضان" },
+    "ramadan": true,
+    "confidence": "predicted",
+    "today": null,
+    "days": [
+      {
+        "hijri": "1448-09-01",
+        "day": 1,
+        "gregorian": "2027-02-08",
+        "confidence": "predicted"
+      }
+    ]
+  }
+}
+```
+
 Failures print an `{ "ok": false, "error": { "code", "message" } }` object to
 stderr and exit non-zero.
 
@@ -155,7 +201,8 @@ maintain a second copy of any date or time.
 - [x] `00` — Repository scaffolding and project standards
 - [x] `01` — Data client: API, cache, Hijri resolution, prayer schedule
 - [x] `02` — CLI experience: onboarding, today view, Ramadan, JSON
-- [ ] `03` — Ramadan month view, status line, shell completions
+- [x] `03` — Hijri month calendar
+- [ ] `04` — Status line and shell completions
 
 Design rationale, coding standards, and acceptance criteria live in
 [`specs/`](./specs/). Contributors should start with
