@@ -3,14 +3,11 @@
 import type { TimeFormat } from "../domain/types.js";
 import type { TodayView } from "../domain/view.js";
 import { DISCLAIMER } from "../domain/view.js";
+import { rightAlign, rtl } from "./rtl.js";
 import { createTheme } from "./theme.js";
 import { formatCountdown, formatTime, formatWeekday } from "./time.js";
 
 const RULE_WIDTH = 40;
-
-const RTL_ISOLATE_START = "\u2068";
-const RTL_ISOLATE_END = "\u2069";
-const ZERO_WIDTH = /\u200c|\u200d|[\u200e\u200f\u202a-\u202e\u2066-\u2069]|\p{M}/gu;
 
 export interface RenderOptions {
   format: TimeFormat;
@@ -97,20 +94,7 @@ function hijriLines(view: TodayView, ascii: boolean): string[] {
   if (ascii) {
     return [base];
   }
-  return [base, rightAlign(rtl(view.hijri.monthName.ur))];
-}
-
-function rtl(text: string): string {
-  return `${RTL_ISOLATE_START}${text}${RTL_ISOLATE_END}`;
-}
-
-function rightAlign(text: string): string {
-  const padding = Math.max(0, RULE_WIDTH - displayWidth(text));
-  return `${" ".repeat(padding)}${text}`;
-}
-
-function displayWidth(text: string): number {
-  return [...text.replace(ZERO_WIDTH, "")].length;
+  return [base, rightAlign(rtl(view.hijri.monthName.ur), RULE_WIDTH)];
 }
 
 function nextLine(view: TodayView): string {
