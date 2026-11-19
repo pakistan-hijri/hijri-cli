@@ -28,14 +28,14 @@ reviewed.
 
 ## 3. Renderers
 
-- [ ] **T3.1** Implement `renderCalendarCard` with the grid, range, confidence,
-      today legend, Ramadan note, and visually ordered Urdu line.
-      — `CAL-GRID-1`–
-      `CAL-GRID-6`
+- [ ] **T3.1** Implement `renderCalendarCard` with the framed title, NOW strip,
+      section rules, grid, range, confidence badge, today legend, Ramadan note,
+      and visually ordered Urdu line. — `CAL-GRID-1`–`CAL-GRID-6`,
+      `CAL-OUT-4`, `CAL-OUT-5`
 - [ ] **T3.2** Implement `renderCalendarPlain` with the same information and no
       decoration. — `CAL-OUT-1`
 - [ ] **T3.3** Implement the stable JSON payload with ordered days.
-      — `CAL-OUT-2`–`CAL-OUT-4`
+      — `CAL-OUT-2`, `CAL-OUT-3`
 - [ ] **T3.4** Add card, plain, JSON, Ramadan, and ASCII goldens and document
       regeneration through `npm run test:update`. — `CAL-NFR-4`
 
@@ -52,6 +52,9 @@ reviewed.
       — `CAL-CMD-1`–`CAL-CMD-5`, `CAL-ERR-1`–`CAL-ERR-4`, `CAL-NFR-5`
 - [ ] **T4.4** Confirm the command contains no duplicated date, rollover, or
       formatting logic. — `CAL-NFR-3`
+- [ ] **T4.5** Build the NOW status from current prayer data, honour the active
+      time format and profile, and map an empty published month to exit `4`.
+      — `CAL-OUT-4`, `CAL-ERR-2`, `CAL-NFR-3`
 
 ## 5. Documentation and verification
 

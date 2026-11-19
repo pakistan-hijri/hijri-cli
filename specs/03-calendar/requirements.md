@@ -19,8 +19,9 @@ confidence as first-class information rather than computing dates locally.
 **Out of scope**
 
 - New date or prayer calculations; all dates come from `hijri-api`.
-- Prayer-time grids, event countdowns, or per-day Sehri/Iftar times.
-- Status line and shell completions (a later milestone).
+- Prayer-time grids or per-day Sehri/Iftar times; a single current-event NOW
+  strip is included.
+- A dedicated status-line mode and shell completions (later milestones).
 
 Requirement IDs use `CAL-<AREA>-<n>` and are referenced from `tasks.md`.
 
@@ -72,8 +73,13 @@ Requirement IDs use `CAL-<AREA>-<n>` and are referenced from `tasks.md`.
   and confidence.
 - **CAL-OUT-3** — JSON SHALL use stable field order, two-space indentation, and
   a trailing newline. stdout SHALL carry only the result.
-- **CAL-OUT-4** — `--24h` SHALL be accepted for flag compatibility but SHALL NOT
-  change the calendar, which displays no times.
+- **CAL-OUT-4** — The card SHALL include a NOW strip with the next event from
+  the already-loaded current prayer data, its time in the active 12- or 24-hour
+  format, and the active profile. `--24h` and `--profile` SHALL visibly change
+  that strip; `--plain` and `--json` SHALL remain unchanged by it.
+- **CAL-OUT-5** — The card SHALL use the shared 40-column decoration system:
+  framed title, section rules, `▸` marker, and confidence badge, with ASCII
+  substitutes when Unicode is unavailable.
 
 ### 3.4 Errors
 

@@ -58,6 +58,11 @@ Commander runs with `exitOverride()` so every failure passes through one
 handler. Help and version map to exit `0`; commander usage errors map to exit
 `2`; anything else goes through `CliError`.
 
+The option tree lives in `src/cli-program.ts`; `src/cli.ts` only supplies the
+writer, clock, API factory, prompts, and command handlers. The factory is
+therefore parseable in tests with spies, which is how flag placement and
+precedence are verified without touching the network or filesystem.
+
 ## 3. Configuration
 
 ```ts

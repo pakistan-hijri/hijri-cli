@@ -25,7 +25,7 @@ Non-goals:
 
 - Computing Hijri dates or prayer times locally.
 - Supporting cities or calculation methods the API does not publish.
-- A status line or shell completions (a later milestone).
+- A dedicated status-line mode or shell completions (a later milestone).
 - Accounts, telemetry, or network writes.
 
 ## 2. Data source contract
@@ -96,7 +96,8 @@ precedence, and flag validation have one implementation.
 
 ```
 src/
-  cli.ts                 entry point: commander, flags, exit codes, wiring
+  cli.ts                 entry point: exit codes, dependency wiring
+  cli-program.ts         commander option definitions and flag precedence
   commands/
     today.ts             orchestrate data → view → renderer
     calendar.ts          orchestrate a Hijri month view
@@ -124,6 +125,7 @@ src/
     writer.ts            Writer sink: stdout for results, stderr for diagnostics
     time.ts              ISO → 12/24-hour display, countdown text
     theme.ts             colour decisions, NO_COLOR aware
+    decor.ts             40-column frames, sections, badges, leaders, glyphs
     today.ts             card and plain renderers for the today view
     calendar.ts          card, plain, and JSON renderers for the month view
     json.ts              stable JSON payload and JSON error payload
@@ -227,7 +229,11 @@ renderers. TTY gets the card; `--plain` gets the same content without decoration
 - **Colour** is enabled only for a TTY, when `NO_COLOR` is unset and
   `--no-color` was not passed. Confidence and Ramadan labels carry meaning in
   words, so colour is never the only channel.
-- **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm`.
+- **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm` in the
+  today card and in the calendar's NOW strip.
+- **Decoration** is card-only: 40-column frames, section rules, confidence
+  badges, dotted leaders, and a `▸` next-event marker, with ASCII substitutes
+  (`+--`, `--`, `[]`, `...`, `>`). `--plain` and `--json` stay undecorated.
 - **Dates** are shown in English plus the API's Urdu month name on a separate
   right-aligned line in visual RTL order under a left-to-right override; the
   ASCII fallback omits the Urdu line.
@@ -235,8 +241,9 @@ renderers. TTY gets the card; `--plain` gets the same content without decoration
   not an official announcement.
 - **Disclaimer:** the today card ends with a short calculated-times notice.
 - **Calendar:** the month grid is Monday-first, shows each Hijri day with its
-  Gregorian day, marks the resolved current day with `*`, and carries a
-  confidence summary. Ramadan months add a Sehri/Iftar note.
+  Gregorian day, marks the resolved current day with `*`, carries a confidence
+  summary, and includes a NOW strip with the next prayer and active profile.
+  Ramadan months add a Sehri/Iftar note.
 
 ## 9. Failure modes
 
@@ -256,13 +263,13 @@ renderers. TTY gets the card; `--plain` gets the same content without decoration
 | Invalid API payload | Exit `3`; report the route and validation failure, never print partial data. |
 | Corrupt config | Exit `2`; name the file and suggest `hijri config --clear`. |
 | Non-TTY with no config | Use defaults; warn on stderr that setup was skipped. |
-| Terminal lacks Unicode | Text fallback: ASCII labels and no card rule. |
+| Terminal lacks Unicode | ASCII decoration: `+--` frames, `--` sections, `>` marker; no Urdu line. |
 
 ## 10. Testing strategy
 
 - **Unit tests** cover date arithmetic, rollover, year selection, cache TTL and
   stale fallback, Sehri/Iftar offsets, next-event selection, config precedence,
-  and renderers.
+  every CLI flag and root/command precedence, and renderers.
 - **Fakes at the seams:** a `fetch` function, a clock, temporary directories,
   and a capturing writer. No live network in the suite.
 - **Golden files** freeze the card, plain, and JSON output, including a Ramadan
@@ -288,8 +295,8 @@ or date library is added.
 - **OD-00-3 — Ramadan presentation.** *Resolved:* inline labels on Fajr and
   Maghrib plus a highlighted Sehri/Iftar block.
 - **OD-00-4 — MVP scope.** *Resolved:* today's date, prayer times, and next
-  event. The month view shipped in milestone 03; status line and completions are
-  deferred.
+  event. The month view shipped in milestone 03; card decoration shipped in
+  milestone 04. A dedicated status-line mode and completions remain deferred.
 - **OD-00-5 — Package identity.** *Resolved:* npm package `hijri-cli`, binary
   `hijri`.
 - **OD-00-6 — Non-interactive default.** *Resolved:* no prompt when stdin or

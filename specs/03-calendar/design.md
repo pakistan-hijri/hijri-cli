@@ -34,8 +34,10 @@ hijri calendar --plain --24h
 current display date. Root flags placed before the subcommand and command flags
 placed after it are merged, with the command flag winning. Accepted values are
 validated in the command layer: integer month in `1..12`, positive integer year.
-`--profile` and `--24h` are accepted for flag compatibility and do not change
-calendar data; the profile is echoed in JSON for scripts that want it.
+`--profile` and `--24h` do not change calendar dates: the profile is echoed in
+JSON and shown in the card legend, while `--24h` controls the NOW strip's time
+format. They are still parsed at the CLI boundary together with every other
+flag.
 
 ## 3. Data flow
 
@@ -98,30 +100,41 @@ interface MonthView {
 ### 5.1 Card
 
 ```
-Hijri · Karachi
-────────────────────────────────────────
-Jumada al-Thani 1448 AH
+╭─ C A L E N D A R ────────────────────╮
+│ Karachi · Jumada al-Thani 1448 AH    │
+╰──────────────────────────────────────╯
                             ⁨جمادی الثانی⁩
-13 Nov – 11 Dec 2026
+12 Nov 2026 – 11 Dec 2026
+── NOW ─────────────────────────────────
+▸ Dhuhr 12:17 · 1h 26m
+── JUMADA AL-THANI ─────────────────────
 Mon Tue Wed Thu Fri Sat Sun
   1   2   3   4   5   6   7
- 13  14  15  16  17  18  19
+ *13  14  15  16  17  18  19
  20  21  22  23  24  25  26
  27  28  29  30
-Confidence: confirmed
+── LEGEND ──────────────────────────────
+* today
+[MIXED]  shia_jafari
+Only confirmed dates are official.
 ```
 
 - Columns are four characters wide: a three-character right-aligned number and
   one separator space. Each week prints the Hijri row, then a dimmed Gregorian
   row of day numbers; the range header supplies month and year.
 - The current day's Hijri cell is `*13` and a `* today` legend follows the grid.
-- Ramadan adds `Ramadan: Sehri ends at Fajr; Iftar at Maghrib.` before the rule
-  or directly under the month line, and the title uses the accent colour.
+  The same legend section carries the confidence badge and active profile.
+- The NOW strip uses `nextEvent()` on already-loaded prayer data. If the next
+  event is after Maghrib tomorrow is loaded once; a null next event prints
+  `Next: unavailable.`. `--24h` changes only this time.
+- Ramadan adds `Ramadan: Sehri ends at Fajr; Iftar at Maghrib.` before the NOW
+  section, and the title uses the accent colour.
 - A non-confirmed day adds `Only confirmed dates are official.` after the
   confidence line.
 - The Urdu line uses the same visual-order reversal, LRO/PDF wrapper, and width
-  rules as the today card. ASCII uses `Hijri - Karachi`, `-` rules, `Mo Tu We Th Fr Sa Su`, and no
-  Urdu line.
+  rules as the today card. ASCII uses `+-- CALENDAR` frames, `--` sections,
+  `> Dhuhr 12:16 PM - 4m`, `[CONFIRMED]`, `Mo Tu We Th Fr Sa Su`, and no Urdu
+  line.
 - Colour never carries meaning alone: `*` and words do the work.
 
 ### 5.2 Plain and JSON
@@ -153,8 +166,8 @@ Confidence: confirmed
 ```
 
 Key order is fixed by object construction. `today` is `null` when the resolved
-day is in another month. No prayer times or countdown appear, so `--24h` cannot
-change the payload.
+day is in another month. No prayer times or countdown appear in the payload, so
+`--24h` affects only the human NOW strip.
 
 ## 6. Errors and exit codes
 
@@ -172,11 +185,14 @@ The shared error taxonomy is unchanged. In addition:
 - `test/domain/month.test.ts`: table-driven month assembly for 29- and 30-day
   months, Monday offsets, trailing slots, today marker, mixed confidence,
   Ramadan, and empty months.
-- `test/render/calendar.test.ts`: goldens for card, plain, JSON, Ramadan, and
-  ASCII; update only with `npm run test:update`.
+- `test/render/calendar.test.ts`: goldens for card, plain, JSON, Ramadan, NOW
+  strip, 24-hour strip, and ASCII; update only with `npm run test:update`.
 - `test/commands/calendar-command.test.ts`: fake API, fixed clock, temporary
   config, capturing writer. Cover defaults, explicit month/year, one-off flags
-  not saved, JSON, invalid input, unpublished year, and stdout/stderr split.
+  not saved, NOW strip inputs, JSON, invalid input, unpublished month/year, and
+  stdout/stderr split.
+- `test/cli/flags.test.ts` and `test/commands/commands.test.ts`: verify calendar
+  flags at the parse boundary as well as their command behaviour.
 - **Manual smoke**: live `hijri calendar`, `hijri calendar --month 9 --year 1448`,
   `--json | jq`, and `--offline`; record in `docs/dev-runs/`.
 
@@ -189,10 +205,13 @@ The shared error taxonomy is unchanged. In addition:
   Putting both dates in one cell would exceed 40 columns.
 - **OD-03-3 — Today marker.** *Resolved:* `*` on the Hijri cell plus a legend.
   Colour alone would fail for pipes and monochrome terminals.
-- **OD-03-4 — Profile and `--24h`.** *Resolved:* accepted and echoed where
-  relevant, but calendar data is profile-independent and contains no times.
+- **OD-03-4 — Profile and `--24h`.** *Revised:* calendar dates and JSON remain
+  profile-independent and time-free, but the card NOW strip shows the active
+  profile and honours `--24h`. This makes one-off flags visible without adding a
+  separate status-line mode.
 - **OD-03-5 — Rollover dependence.** *Resolved:* reuse the Maghrib rollover so
   the calendar and today view agree about "today", even though it costs one
   extra prayer lookup.
-- **OD-03-6 — Later milestone split.** *Resolved:* this milestone ships only the
-  month view; status line and shell completions remain a separate milestone.
+- **OD-03-6 — Later milestone split.** *Resolved:* this milestone ships the
+  month view plus its single NOW strip; a dedicated status-line mode and shell
+  completions remain a separate milestone.

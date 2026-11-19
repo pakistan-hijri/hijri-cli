@@ -20,6 +20,12 @@ reviewed.
       — `CLI-ERR-3`, `CLI-ERR-4`, `CLI-ERR-5`
 - [ ] **T1.5** Reject `--midnight` with `--after-maghrib`; make `--json` win
       over `--plain`. — `CLI-PREC-4`, `CLI-JSON-1`
+- [ ] **T1.6** Extract `src/cli-program.ts` so Commander options, root/command
+      precedence, and handler wiring can be tested without I/O.
+      — `CLI-FLG-1`, `CLI-FLG-2`
+- [ ] **T1.7** Test every flag, both placements, precedence, colour gating,
+      Unicode fallback, help, version, and unknown flags at the CLI boundary.
+      — `CLI-FLG-1`–`CLI-FLG-3`, `CLI-CMD-7`
 
 ## 2. Configuration
 
@@ -84,6 +90,10 @@ reviewed.
 - [ ] **T5.8** Right-align the Urdu line, reverse it into visual RTL order under
       LRO/PDF, and omit it in ASCII; freeze it in the card and plain goldens.
       — `CLI-CARD-10`
+- [ ] **T5.9** Use the shared decoration helpers for the framed title, section
+      rules, next marker, prayer leaders, and confidence badge; review the
+      updated card goldens and confirm plain output is unchanged.
+      — `CLI-CARD-11`, `CLI-PLAIN-1`
 
 ## 6. Failure behaviour
 

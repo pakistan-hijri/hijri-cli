@@ -69,17 +69,35 @@ countdown. Outside Ramadan those rows read as ordinary Fajr and Maghrib.
 `hijri calendar` prints the Hijri month as a Monday-first grid. Each week shows
 the Hijri day numbers above the matching Gregorian day numbers, with the full
 Gregorian range in the header. The resolved current day is marked `*` and
-Ramadan months explain that Sehri ends at Fajr and Iftar at Maghrib. Dates still
-come from `hijri-api`; the CLI computes no calendar of its own.
+Ramadan months explain that Sehri ends at Fajr and Iftar at Maghrib. A NOW strip
+shows the next event, its time, and the active prayer profile. Dates still come
+from `hijri-api`; the CLI computes no calendar of its own.
+
+```text
+╭─ C A L E N D A R ────────────────────╮
+│ Karachi · Jumada al-Thani 1448 AH    │
+╰──────────────────────────────────────╯
+                            ⁨جمادی الثانی⁩
+12 Nov 2026 – 11 Dec 2026
+── NOW ─────────────────────────────────
+▸ Dhuhr 12:17 · 1h 26m
+── JUMADA AL-THANI ─────────────────────
+...
+── LEGEND ──────────────────────────────
+* today
+[MIXED]  shia_jafari
+Only confirmed dates are official.
+```
 
 ```sh
 hijri calendar --month 9 --year 1448 --json
+hijri calendar --24h --profile shia_jafari
 ```
 
-`--plain` drops the card decoration. `--24h` is accepted for consistency but the
-calendar contains no times. All dates come from the published calendar files,
-and a month whose dates are not all confirmed carries the same warning as the
-today view.
+`--24h` changes the NOW strip's time and `--profile` is shown in the legend;
+neither changes calendar dates or JSON. `--plain` drops the card decoration, and
+a month whose dates are not all confirmed carries the same warning as the today
+view. All dates come from the published calendar files.
 
 ### Date convention
 
@@ -196,13 +214,32 @@ The data contract, confidence model, source record, and audit trail live in
 [`hijri-api`](https://github.com/pakistan-hijri/hijri-api). This CLI does not
 maintain a second copy of any date or time.
 
+## Development
+
+Run the local TypeScript entry point with `npm run dev --` followed by any
+flags:
+
+```sh
+npm run dev -- --city lahore --24h
+npm run dev -- calendar --month 9 --year 1448 --json
+```
+
+npm prints its own banner to stdout. When piping JSON, call `tsx` or the built
+CLI directly so stdout carries only the result:
+
+```sh
+npx tsx src/cli.ts --offline --json
+npm run build && node dist/cli.js calendar --json
+```
+
 ## Roadmap
 
 - [x] `00` — Repository scaffolding and project standards
 - [x] `01` — Data client: API, cache, Hijri resolution, prayer schedule
 - [x] `02` — CLI experience: onboarding, today view, Ramadan, JSON
 - [x] `03` — Hijri month calendar
-- [ ] `04` — Status line and shell completions
+- [x] `04` — Presentation: decorated today and calendar cards, NOW strip
+- [ ] `05` — Standalone status line and shell completions
 
 Design rationale, coding standards, and acceptance criteria live in
 [`specs/`](./specs/). Contributors should start with
