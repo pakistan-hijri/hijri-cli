@@ -125,6 +125,7 @@ src/
     writer.ts            Writer sink: stdout for results, stderr for diagnostics
     time.ts              ISO → 12/24-hour display, countdown text
     theme.ts             colour decisions, NO_COLOR aware
+    rtl.ts               RTL mode detection, bidi controls, display width
     decor.ts             40-column frames, sections, badges, leaders, glyphs
     today.ts             card and plain renderers for the today view
     calendar.ts          card, plain, and JSON renderers for the month view
@@ -235,8 +236,9 @@ renderers. TTY gets the card; `--plain` gets the same content without decoration
   badges, dotted leaders, and a `▸` next-event marker, with ASCII substitutes
   (`+--`, `--`, `[]`, `...`, `>`). `--plain` and `--json` stay undecorated.
 - **Dates** are shown in English plus the API's Urdu month name on a separate
-  right-aligned line in visual RTL order under a left-to-right override; the
-  ASCII fallback omits the Urdu line.
+  right-aligned line. Bidi-capable terminals get logical RLI/PDI text; VS
+  Code/xterm and unknown terminals get reversed LRO/PDF text. `HIJRI_CLI_RTL`
+  overrides the detected mode; the ASCII fallback omits the Urdu line.
 - **Confidence** is always printed. Anything other than `confirmed` says it is
   not an official announcement.
 - **Disclaimer:** the today card ends with a short calculated-times notice.

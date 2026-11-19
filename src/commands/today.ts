@@ -14,6 +14,7 @@ import type { HijriApi } from "../api/client.js";
 import type { OnboardPrompts } from "../onboard/prompts.js";
 import { loadRunSettings, parseConvention, parseProfile } from "./settings.js";
 import { renderJsonSuccess } from "../render/json.js";
+import type { RtlMode } from "../render/rtl.js";
 import { renderCard, renderPlain } from "../render/today.js";
 import type { Writer } from "../render/writer.js";
 
@@ -40,6 +41,7 @@ export interface TodayDeps {
   isTTY: boolean;
   colorEnabled: boolean;
   unicode: boolean;
+  rtlMode: RtlMode;
 }
 
 export async function runToday(
@@ -157,6 +159,7 @@ export async function runToday(
     format: config.timeFormat,
     color: deps.colorEnabled && flags.plain !== true,
     ascii: !deps.unicode,
+    rtlMode: deps.rtlMode,
   };
 
   deps.writer.out(

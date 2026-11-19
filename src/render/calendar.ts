@@ -12,6 +12,7 @@ import {
 } from "./decor.js";
 import type { DecorStyle } from "./decor.js";
 import { rightAlign, visualRtl } from "./rtl.js";
+import type { RtlMode } from "./rtl.js";
 import { createTheme } from "./theme.js";
 import { formatCountdown, formatTime } from "./time.js";
 
@@ -32,6 +33,7 @@ const shortDate = new Intl.DateTimeFormat("en-GB", {
 export interface CalendarRenderOptions {
   color: boolean;
   ascii: boolean;
+  rtlMode: RtlMode;
   format: TimeFormat;
   status: StatusView | null;
 }
@@ -52,7 +54,7 @@ export function renderCalendarCard(
   ];
 
   if (!options.ascii) {
-    lines.push(rightAlign(visualRtl(view.monthName.ur), RULE_WIDTH));
+    lines.push(urduLine(view.monthName.ur, options.rtlMode));
   }
   lines.push(gregorianRange(view, options.ascii));
 
@@ -104,7 +106,7 @@ export function renderCalendarPlain(
   ];
 
   if (!options.ascii) {
-    lines.push(rightAlign(visualRtl(view.monthName.ur), RULE_WIDTH));
+    lines.push(urduLine(view.monthName.ur, options.rtlMode));
   }
   lines.push(gregorianRange(view, options.ascii));
 
@@ -158,6 +160,10 @@ export function renderCalendarJson(view: MonthView): string {
     },
   };
   return `${JSON.stringify(payload, null, 2)}\n`;
+}
+
+function urduLine(name: string, rtlMode: RtlMode): string {
+  return rightAlign(visualRtl(name, rtlMode), RULE_WIDTH);
 }
 
 function statusLine(

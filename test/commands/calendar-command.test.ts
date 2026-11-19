@@ -106,6 +106,7 @@ function deps(dirPath: string, writer: ReturnType<typeof capturingWriter>) {
     isTTY: false,
     colorEnabled: false,
     unicode: true,
+    rtlMode: "visual" as const,
   };
 }
 

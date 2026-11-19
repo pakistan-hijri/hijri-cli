@@ -13,6 +13,7 @@ import {
 } from "./decor.js";
 import type { DecorStyle } from "./decor.js";
 import { rightAlign, visualRtl } from "./rtl.js";
+import type { RtlMode } from "./rtl.js";
 import { createTheme } from "./theme.js";
 import { formatCountdown, formatTime, formatWeekday } from "./time.js";
 
@@ -22,6 +23,7 @@ export interface RenderOptions {
   format: TimeFormat;
   color: boolean;
   ascii: boolean;
+  rtlMode: RtlMode;
 }
 
 export function renderCard(view: TodayView, options: RenderOptions): string {
@@ -34,7 +36,7 @@ export function renderCard(view: TodayView, options: RenderOptions): string {
       `${view.city.name}${separator}${formatWeekday(view.gregorian)}`,
       style,
     ),
-    ...hijriLines(view, options.ascii),
+    ...hijriLines(view, options.ascii, options.rtlMode),
   ];
 
   if (view.afterMaghrib) {
@@ -79,7 +81,7 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   const lines = [
     `Hijri${separator}${view.city.name}`,
     formatWeekday(view.gregorian),
-    ...hijriLines(view, options.ascii),
+    ...hijriLines(view, options.ascii, options.rtlMode),
     `Confidence: ${view.confidence}`,
   ];
 
@@ -104,12 +106,19 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   return `${lines.join("\n")}\n`;
 }
 
-function hijriLines(view: TodayView, ascii: boolean): string[] {
+function hijriLines(
+  view: TodayView,
+  ascii: boolean,
+  rtlMode: RtlMode,
+): string[] {
   const base = `${view.hijri.day} ${view.hijri.monthName.en} ${view.hijri.year} AH`;
   if (ascii) {
     return [base];
   }
-  return [base, rightAlign(visualRtl(view.hijri.monthName.ur), RULE_WIDTH)];
+  return [
+    base,
+    rightAlign(visualRtl(view.hijri.monthName.ur, rtlMode), RULE_WIDTH),
+  ];
 }
 
 function nextLine(view: TodayView): string {

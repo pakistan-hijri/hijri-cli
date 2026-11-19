@@ -44,6 +44,9 @@ Out of scope:
   `...` leaders without losing information.
 - **PRE-DEC-5** — Decoration SHALL NOT introduce a runtime dependency; it uses
   the existing pure theme and RTL helpers.
+- **PRE-DEC-6** — Urdu output SHALL auto-detect bidi-capable terminals and use
+  logical RLI/PDI there, while VS Code/xterm and unknown terminals use reversed
+  LRO/PDF. `HIJRI_CLI_RTL=logical|visual` SHALL override detection.
 
 ### 3.2 Today card
 

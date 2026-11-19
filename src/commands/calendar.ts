@@ -22,6 +22,7 @@ import {
   renderCalendarJson,
   renderCalendarPlain,
 } from "../render/calendar.js";
+import type { RtlMode } from "../render/rtl.js";
 import type { Writer } from "../render/writer.js";
 import { loadRunSettings, parseProfile } from "./settings.js";
 
@@ -52,6 +53,7 @@ export interface CalendarDeps {
   isTTY: boolean;
   colorEnabled: boolean;
   unicode: boolean;
+  rtlMode: RtlMode;
 }
 
 export async function runCalendar(
@@ -174,6 +176,7 @@ export async function runCalendar(
   const humanOptions = {
     color: deps.colorEnabled && flags.plain !== true,
     ascii: !deps.unicode,
+    rtlMode: deps.rtlMode,
     format: config.timeFormat,
     status,
   };

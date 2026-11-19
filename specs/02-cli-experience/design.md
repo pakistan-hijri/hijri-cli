@@ -281,11 +281,14 @@ Rules:
 - Next line is omitted for an explicit date; instead the card prints
   `Date lookup: no countdown.`
 - `--no-color` and `NO_COLOR` produce the same text without ANSI codes.
-- The Urdu name is a separate line, right-aligned to the 40-column width. Its
-  graphemes are reversed into visual RTL order and wrapped in LRO/PDF
-  (U+202D/U+202C), so bidi-aware terminals and the many terminals that ignore
-  bidi controls both draw it right-to-left. Display width ignores bidi
-  controls, joiners, and combining marks.
+- The Urdu name is a separate line, right-aligned to the 40-column width. Two
+  modes are emitted: `logical` wraps the untouched text in RLI/PDI
+  (U+2067/U+2069) for terminals with bidi and Arabic shaping, while `visual`
+  reverses graphemes under LRO/PDF (U+202D/U+202C) for terminals that ignore
+  bidi controls. `detectRtlMode(env)` selects Konsole, iTerm2, Windows
+  Terminal, GNOME Terminal, and kitty as `logical`; VS Code/xterm and unknown
+  terminals stay `visual`. `HIJRI_CLI_RTL=logical|visual` overrides detection.
+  Display width ignores bidi controls, joiners, and combining marks.
 - The ASCII fallback omits the Urdu line and uses `-` rules.
 
 ### 7.3 Plain
@@ -366,8 +369,9 @@ got far enough to know that.
   `--24h` does not change the machine contract.
 - **OD-02-8 — Debug output.** *Resolved:* `HIJRI_CLI_DEBUG=1` adds a stack trace
   to stderr; it never changes stdout.
-- **OD-02-9 — RTL strategy.** *Resolved:* emit graphemes in visual order inside
-  an LRO/PDF pair. FSI/PDI isolates were tried first but only affect
-  bidi-aware renderers; common terminal emulators ignore them and keep drawing
-  the logical string left-to-right. Reversal plus an LTR override works in both
-  cases. Letter joining still depends on the terminal's shaper.
+- **OD-02-9 — RTL strategy.** *Revised:* auto-detect the terminal and choose
+  between native logical RTL and the visual fallback. The visual reversal is
+  still needed for VS Code/xterm, but it breaks contextual joining in
+  bidi-aware terminals such as Konsole; logical RLI/PDI fixes those terminals.
+  `HIJRI_CLI_RTL` forces a mode when detection is wrong. No single byte sequence
+  satisfies both terminal classes because shaping is the terminal's job.

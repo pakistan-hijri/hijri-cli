@@ -123,9 +123,11 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
 - **CLI-CARD-9** — WHEN Unicode is unavailable, THE SYSTEM SHALL fall back to
   ASCII labels and plain rules; meaning SHALL never depend on colour.
 - **CLI-CARD-10** — The Urdu month name SHALL be rendered on its own line,
-  right-aligned to the card width and reversed into visual RTL order under a
-  Unicode left-to-right override, so terminals without bidi support still show
-  the intended direction. The ASCII fallback SHALL omit that line.
+  right-aligned to the card width. In `logical` mode it SHALL be wrapped in
+  RLI/PDI so terminals with bidi and shaping render it natively; in `visual`
+  mode its graphemes SHALL be reversed under LRO/PDF for terminals that ignore
+  bidi controls. The mode SHALL be auto-detected from the terminal environment
+  and overridable with `HIJRI_CLI_RTL`. The ASCII fallback SHALL omit that line.
 - **CLI-CARD-11** — The card SHALL use 40-column decorative frames, section
   rules, a next-event marker, dotted leaders, and a confidence badge. The
   Unicode variant SHALL fall back to ASCII equivalents when Unicode is

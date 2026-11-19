@@ -87,8 +87,9 @@ reviewed.
       — `CLI-NFR-3`
 - [ ] **T5.7** Add `npm run test:update` and document that goldens change only
       through it. — `CLI-NFR-3`
-- [ ] **T5.8** Right-align the Urdu line, reverse it into visual RTL order under
-      LRO/PDF, and omit it in ASCII; freeze it in the card and plain goldens.
+- [ ] **T5.8** Right-align the Urdu line, emit logical RLI/PDI or visual
+      LRO/PDF based on terminal detection and `HIJRI_CLI_RTL`, and omit it in
+      ASCII; freeze the visual form in goldens and test both modes.
       — `CLI-CARD-10`
 - [ ] **T5.9** Use the shared decoration helpers for the framed title, section
       rules, next marker, prayer leaders, and confidence badge; review the

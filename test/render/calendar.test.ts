@@ -13,6 +13,7 @@ import { hijriDay, readGolden, writeGolden } from "../support.js";
 const options = {
   color: false,
   ascii: false,
+  rtlMode: "visual" as const,
   format: "12h" as const,
   status: sampleStatus(),
 };
@@ -76,6 +77,7 @@ describe("calendar renderers", () => {
       renderCalendarCard(sampleMonth(), {
         color: false,
         ascii: true,
+        rtlMode: "visual",
         format: "12h",
         status: sampleStatus(),
       }),
@@ -89,6 +91,15 @@ describe("calendar renderers", () => {
     );
     expect(card).toContain("[MIXED]");
     expect(card).toContain("Only confirmed dates are official.");
+  });
+
+  it("emits logical Urdu for native RTL terminals", () => {
+    const card = renderCalendarCard(sampleMonth(), {
+      ...options,
+      rtlMode: "logical",
+    });
+    expect(card).toContain("\u2067جمادی الثانی\u2069");
+    expect(card).not.toContain("\u202d");
   });
 
   it("emits every day once and in order in JSON", () => {

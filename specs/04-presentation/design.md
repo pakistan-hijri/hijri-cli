@@ -63,9 +63,11 @@ existing `displayWidth` helper from `src/render/rtl.ts`.
 Calculated times; verify locally.
 ```
 
-The Urdu line keeps the milestone-02 visual RTL order and width rules. The
-confidence badge is bold but also reads plainly as `[CONFIRMED]`, so meaning
-does not depend on colour.
+The Urdu line keeps its own line and width rules. `detectRtlMode(env)` chooses
+logical RLI/PDI for bidi-aware terminals and visual LRO/PDF for VS Code/xterm;
+`HIJRI_CLI_RTL=logical|visual` overrides the choice. The confidence badge is
+bold but also reads plainly as `[CONFIRMED]`, so meaning does not depend on
+colour.
 
 ## 5. Calendar card composition
 
@@ -115,6 +117,8 @@ interface CalendarRenderOptions {
 
 - `test/render/decor.test.ts`: helper outputs for both glyph sets, ANSI width,
   truncation, and minimum leader length.
+- `test/render/rtl.test.ts`: terminal detection table, both RTL modes, override
+  precedence, and bidi-control width handling.
 - `test/render/render.test.ts` and `test/render/calendar.test.ts`: today/calendar
   goldens for Unicode, ASCII, Ramadan, Maghrib rollover, date lookup, and
   24-hour NOW strip.
@@ -131,7 +135,9 @@ interface CalendarRenderOptions {
 - **OD-04-2 — Fixed width.** *Resolved:* 40 columns for both cards, matching the
   existing calendar grid and keeping `jq`-friendly terminal output predictable.
 - **OD-04-3 — Fallback.** *Resolved:* automatic locale/`TERM` detection, not an
-  extra flag; users already have `--plain` and `--no-color`.
+  extra flag; users already have `--plain` and `--no-color`. Urdu RTL mode uses
+  terminal-family detection plus `HIJRI_CLI_RTL` because no single byte stream
+  shapes correctly in both Konsole and VS Code.
 - **OD-04-4 — Calendar visibility for flags.** *Resolved:* a NOW strip is enough
   to make `--24h` and `--profile` visible without adding a separate status-line
   mode. This revises `OD-03-4`.

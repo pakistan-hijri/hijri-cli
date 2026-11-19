@@ -16,6 +16,9 @@ preserved.
 - [ ] **T1.3** Add Unicode and ASCII variants for every helper, including
       subtitle truncation and minimum leader length in `test/render/decor.test.ts`.
       — `PRE-DEC-2`, `PRE-DEC-4`, `PRE-NFR-1`
+- [ ] **T1.4** Add terminal-family detection, logical/visual RTL modes, and the
+      `HIJRI_CLI_RTL` override; test both modes and every detection branch.
+      — `PRE-DEC-6`, `PRE-NFR-1`
 
 ## 2. Today card
 

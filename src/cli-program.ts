@@ -11,6 +11,8 @@ import type { TodayFlags } from "./commands/today.js";
 import { resolveCacheDir } from "./config/paths.js";
 import { FileCache } from "./api/cache.js";
 import type { OnboardPrompts } from "./onboard/prompts.js";
+import { detectRtlMode } from "./render/rtl.js";
+import type { RtlMode } from "./render/rtl.js";
 import { supportsUnicode } from "./render/theme.js";
 import type { Writer } from "./render/writer.js";
 import { VERSION } from "./version.js";
@@ -55,6 +57,7 @@ interface RuntimeDeps {
   isTTY: boolean;
   colorEnabled: boolean;
   unicode: boolean;
+  rtlMode: RtlMode;
 }
 
 export interface ProgramDeps {
@@ -243,6 +246,7 @@ function runtime(deps: ProgramDeps, options: CliOptions): RuntimeDeps {
       deps.stdoutIsTTY &&
       deps.env.NO_COLOR === undefined,
     unicode: supportsUnicode(deps.env),
+    rtlMode: detectRtlMode(deps.env),
   };
 }
 

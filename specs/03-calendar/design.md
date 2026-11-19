@@ -131,8 +131,8 @@ Only confirmed dates are official.
   section, and the title uses the accent colour.
 - A non-confirmed day adds `Only confirmed dates are official.` after the
   confidence line.
-- The Urdu line uses the same visual-order reversal, LRO/PDF wrapper, and width
-  rules as the today card. ASCII uses `+-- CALENDAR` frames, `--` sections,
+- The Urdu line uses the same detected logical/RLI-PDI or visual/LRO-PDF mode
+  and width rules as the today card. ASCII uses `+-- CALENDAR` frames, `--` sections,
   `> Dhuhr 12:16 PM - 4m`, `[CONFIRMED]`, `Mo Tu We Th Fr Sa Su`, and no Urdu
   line.
 - Colour never carries meaning alone: `*` and words do the work.

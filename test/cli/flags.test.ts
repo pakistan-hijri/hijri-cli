@@ -260,6 +260,22 @@ describe("cli flag parsing", () => {
     expect(firstCall(result.today).deps).toMatchObject({ unicode: false });
   });
 
+  it("detects the RTL mode from the terminal", async () => {
+    const konsole = await parse([], { env: { KONSOLE_VERSION: "240401" } });
+    const vscode = await parse([], { env: { TERM_PROGRAM: "vscode" } });
+
+    expect(firstCall(konsole.today).deps).toMatchObject({ rtlMode: "logical" });
+    expect(firstCall(vscode.today).deps).toMatchObject({ rtlMode: "visual" });
+  });
+
+  it("honours the HIJRI_CLI_RTL override", async () => {
+    const result = await parse([], {
+      env: { KONSOLE_VERSION: "240401", HIJRI_CLI_RTL: "visual" },
+    });
+
+    expect(firstCall(result.today).deps).toMatchObject({ rtlMode: "visual" });
+  });
+
   it("prints help and version without calling a handler", async () => {
     const help = await parse(["--help"]);
     expect(help.error).toBeInstanceOf(CommanderError);

@@ -93,6 +93,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -116,6 +117,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -146,6 +148,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -169,6 +172,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -192,6 +196,7 @@ describe("runToday", () => {
         isTTY: true,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -218,6 +223,7 @@ describe("runToday", () => {
           isTTY: false,
           colorEnabled: false,
           unicode: true,
+          rtlMode: "visual",
         },
       ),
     ).rejects.toBeInstanceOf(UsageError);
@@ -238,6 +244,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -261,6 +268,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -286,6 +294,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -308,6 +317,7 @@ describe("runToday", () => {
           isTTY: false,
           colorEnabled: false,
           unicode: true,
+          rtlMode: "visual",
         },
       ),
     ).rejects.toBeInstanceOf(UsageError);
@@ -328,6 +338,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
