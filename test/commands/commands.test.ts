@@ -96,7 +96,7 @@ describe("runToday", () => {
       },
     );
 
-    expect(writer.stdout).toContain("Hijri · Karachi");
+    expect(writer.stdout).toContain("H I J R I");
     expect(writer.stdout).toContain("2 Jumada al-Thani 1448 AH");
     expect(writer.stderr).toContain("No saved configuration");
     await dir.cleanup();
@@ -200,7 +200,7 @@ describe("runToday", () => {
       city: "karachi",
       profile: "sunni_hanafi",
     });
-    expect(writer.stdout).toContain("Hijri · Karachi");
+    expect(writer.stdout).toContain("H I J R I");
     await dir.cleanup();
   });
 

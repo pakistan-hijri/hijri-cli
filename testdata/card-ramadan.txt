@@ -1,18 +1,19 @@
-Hijri · Karachi
-────────────────────────────────────────
-Monday, 8 February 2027
+╭─ H I J R I ──────────────────────────╮
+│ Karachi · Monday, 8 February 2027    │
+╰──────────────────────────────────────╯
 1 Ramadan 1448 AH
                                    ‭ناضمر‬
-Next: Iftar in 3h
-Sehri ends 5:53 AM · Iftar 6:22 PM
-
-Sehri ends 5:53 AM
-Sunrise    7:11 AM
-Dhuhr      12:46 PM
-Asr        4:45 PM
-Iftar      6:22 PM
-Isha       7:39 PM
-
-Confidence: predicted
+── NEXT ────────────────────────────────
+▸ Next: Iftar in 3h
+☾ Sehri ends 5:53 AM · Iftar 6:22 PM
+── PRAYERS ─────────────────────────────
+  Sehri ends ··················· 5:53 AM
+  Sunrise ······················ 7:11 AM
+  Dhuhr ······················· 12:46 PM
+  Asr ·························· 4:45 PM
+  Iftar ························ 6:22 PM
+  Isha ························· 7:39 PM
+── STATUS ──────────────────────────────
+[PREDICTED]  sunni_hanafi
 Only confirmed dates are official.
 Calculated times; verify locally.
