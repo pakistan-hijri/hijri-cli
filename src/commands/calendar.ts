@@ -102,14 +102,22 @@ export async function runCalendar(
     );
   }
 
-  const view = buildMonthView({
-    city: { id: config.city, name: civilPrayer.meta.cityName },
-    profile: config.profile,
-    year,
-    month,
-    days: file.days,
-    todayHijri: current.hijri,
-  });
+  let view: ReturnType<typeof buildMonthView>;
+  try {
+    view = buildMonthView({
+      city: { id: config.city, name: civilPrayer.meta.cityName },
+      profile: config.profile,
+      year,
+      month,
+      days: file.days,
+      todayHijri: current.hijri,
+    });
+  } catch (error) {
+    if (error instanceof DataUnavailableError) {
+      throw new OutOfRangeError(error.message, error);
+    }
+    throw error;
+  }
 
   if (flags.json === true) {
     deps.writer.out(renderCalendarJson(view));

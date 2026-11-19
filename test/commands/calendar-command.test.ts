@@ -57,16 +57,27 @@ function fakeApi(): Pick<
         ? Promise.resolve(city)
         : Promise.reject(new UsageError(`Unknown city "${id}".`)),
     calendarIndex: () => Promise.resolve(index),
-    calendarYear: (year: number) =>
-      year === 1448
-        ? Promise.resolve({
-            hijriYear: 1448,
-            coverageStart: null,
-            generatedAt: index.generatedAt,
-            baseline: index.baseline,
-            days,
-          })
-        : Promise.reject(new DataUnavailableError(`No calendar for ${year}.`)),
+    calendarYear: (year: number) => {
+      if (year === 1448) {
+        return Promise.resolve({
+          hijriYear: 1448,
+          coverageStart: null,
+          generatedAt: index.generatedAt,
+          baseline: index.baseline,
+          days,
+        });
+      }
+      if (year === 1449) {
+        return Promise.resolve({
+          hijriYear: 1449,
+          coverageStart: null,
+          generatedAt: index.generatedAt,
+          baseline: index.baseline,
+          days: daysFor(1, 30, "2027-06-15", { en: "Muharram", ur: "محرم" }),
+        });
+      }
+      return Promise.reject(new DataUnavailableError(`No calendar for ${year}.`));
+    },
     calendarDay: (date: string) =>
       date === "2026-11-13"
         ? Promise.resolve(hijriDay())
@@ -170,10 +181,33 @@ describe("runCalendar", () => {
     await dir.cleanup();
   });
 
-  it("does not save one-off flags", async () => {
+  it("reports an unpublished month in a published year as out of range", async () => {
     const dir = await tempDir();
+    await expect(
+      runCalendar(
+        { month: "9", year: "1449" },
+        deps(dir.path, capturingWriter()),
+      ),
+    ).rejects.toMatchObject({ code: "out_of_range", exitCode: 4 });
+    await dir.cleanup();
+  });
+
+  it("echoes a one-off profile in JSON without saving it", async () => {
+    const dir = await tempDir();
+    const writer = capturingWriter();
     const configPath = join(dir.path, "config.json");
-    await runCalendar({ city: "karachi" }, deps(dir.path, capturingWriter()));
+    await runCalendar(
+      { city: "karachi", profile: "shia_jafari", json: true },
+      deps(dir.path, writer),
+    );
+
+    const payload = JSON.parse(writer.stdout) as {
+      data: { city: string; profile: string };
+    };
+    expect(payload.data).toMatchObject({
+      city: "karachi",
+      profile: "shia_jafari",
+    });
     await expect(readFile(configPath, "utf8")).rejects.toThrow();
     await dir.cleanup();
   });
