@@ -229,7 +229,8 @@ renderers. TTY gets the card; `--plain` gets the same content without decoration
   words, so colour is never the only channel.
 - **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm`.
 - **Dates** are shown in English plus the API's Urdu month name on a separate
-  right-aligned, bidi-isolated line; the ASCII fallback omits the Urdu line.
+  right-aligned line in visual RTL order under a left-to-right override; the
+  ASCII fallback omits the Urdu line.
 - **Confidence** is always printed. Anything other than `confirmed` says it is
   not an official announcement.
 - **Disclaimer:** the today card ends with a short calculated-times notice.

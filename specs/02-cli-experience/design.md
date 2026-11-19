@@ -276,10 +276,11 @@ Rules:
 - Next line is omitted for an explicit date; instead the card prints
   `Date lookup: no countdown.`
 - `--no-color` and `NO_COLOR` produce the same text without ANSI codes.
-- The Urdu name is a separate line, right-aligned to the 40-column width and
-  wrapped in FSI/PDI isolates (U+2068/U+2069), so a bidi-aware terminal cannot
-  pull the date line's punctuation into the RTL run. Display width ignores
-  bidi controls, joiners, and combining marks.
+- The Urdu name is a separate line, right-aligned to the 40-column width. Its
+  graphemes are reversed into visual RTL order and wrapped in LRO/PDF
+  (U+202D/U+202C), so bidi-aware terminals and the many terminals that ignore
+  bidi controls both draw it right-to-left. Display width ignores bidi
+  controls, joiners, and combining marks.
 - The ASCII fallback omits the Urdu line and uses `-` rules.
 
 ### 7.3 Plain
@@ -360,3 +361,8 @@ got far enough to know that.
   `--24h` does not change the machine contract.
 - **OD-02-8 — Debug output.** *Resolved:* `HIJRI_CLI_DEBUG=1` adds a stack trace
   to stderr; it never changes stdout.
+- **OD-02-9 — RTL strategy.** *Resolved:* emit graphemes in visual order inside
+  an LRO/PDF pair. FSI/PDI isolates were tried first but only affect
+  bidi-aware renderers; common terminal emulators ignore them and keep drawing
+  the logical string left-to-right. Reversal plus an LTR override works in both
+  cases. Letter joining still depends on the terminal's shaper.

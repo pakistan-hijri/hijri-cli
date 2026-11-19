@@ -119,8 +119,8 @@ Confidence: confirmed
   or directly under the month line, and the title uses the accent colour.
 - A non-confirmed day adds `Only confirmed dates are official.` after the
   confidence line.
-- The Urdu line uses the same FSI/PDI isolation and width rules as the today
-  card. ASCII uses `Hijri - Karachi`, `-` rules, `Mo Tu We Th Fr Sa Su`, and no
+- The Urdu line uses the same visual-order reversal, LRO/PDF wrapper, and width
+  rules as the today card. ASCII uses `Hijri - Karachi`, `-` rules, `Mo Tu We Th Fr Sa Su`, and no
   Urdu line.
 - Colour never carries meaning alone: `*` and words do the work.
 

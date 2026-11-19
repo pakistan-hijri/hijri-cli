@@ -29,7 +29,8 @@ reviewed.
 ## 3. Renderers
 
 - [ ] **T3.1** Implement `renderCalendarCard` with the grid, range, confidence,
-      today legend, Ramadan note, and bidi-isolated Urdu line. — `CAL-GRID-1`–
+      today legend, Ramadan note, and visually ordered Urdu line.
+      — `CAL-GRID-1`–
       `CAL-GRID-6`
 - [ ] **T3.2** Implement `renderCalendarPlain` with the same information and no
       decoration. — `CAL-OUT-1`

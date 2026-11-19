@@ -81,8 +81,9 @@ reviewed.
       — `CLI-NFR-3`
 - [ ] **T5.7** Add `npm run test:update` and document that goldens change only
       through it. — `CLI-NFR-3`
-- [ ] **T5.8** Right-align and bidi-isolate the Urdu month line and omit it in
-      ASCII; freeze it in the card and plain goldens. — `CLI-CARD-10`
+- [ ] **T5.8** Right-align the Urdu line, reverse it into visual RTL order under
+      LRO/PDF, and omit it in ASCII; freeze it in the card and plain goldens.
+      — `CLI-CARD-10`
 
 ## 6. Failure behaviour
 

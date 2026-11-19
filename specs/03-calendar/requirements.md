@@ -55,7 +55,7 @@ Requirement IDs use `CAL-<AREA>-<n>` and are referenced from `tasks.md`.
   that Sehri ends at Fajr and Iftar at Maghrib; other months SHALL NOT print
   that note.
 - **CAL-GRID-5** — The card SHALL show the English and Urdu month names; the
-  Urdu name SHALL be on its own right-aligned, bidi-isolated line as in the
+  Urdu name SHALL be on its own right-aligned line in visual RTL order as in the
   today card. The ASCII fallback SHALL omit it.
 - **CAL-GRID-6** — The card SHALL show a confidence summary. When all days share
   one confidence it SHALL print that value; otherwise it SHALL print `mixed`.
