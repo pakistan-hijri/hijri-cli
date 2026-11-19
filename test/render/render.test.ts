@@ -117,13 +117,13 @@ describe("human renderers", () => {
     );
   });
 
-  it("right-aligns and isolates the Urdu month name", () => {
+  it("right-aligns and visually orders the Urdu month name", () => {
     const lines = renderCard(sampleView(), options).split("\n");
-    const urdu = lines.find((line) => line.includes("\u2068"));
-    expect(urdu?.endsWith("\u2068جمادی الثانی\u2069")).toBe(true);
-    expect(urdu?.replace(/[\u2068\u2069]/gu, "").length).toBe(40);
+    const urdu = lines.find((line) => line.includes("\u202d"));
+    expect(urdu?.endsWith("\u202dیناثلا یدامج\u202c")).toBe(true);
+    expect(urdu?.replace(/[\u202c\u202d]/gu, "").length).toBe(40);
     expect(renderCard(sampleView(), { ...options, ascii: true })).not.toContain(
-      "\u2068",
+      "\u202d",
     );
   });
 

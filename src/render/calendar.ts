@@ -1,7 +1,7 @@
 /** Pure card, plain, and JSON renderers for the Hijri month view. */
 
 import type { MonthCell, MonthView } from "../domain/month.js";
-import { rightAlign, rtl } from "./rtl.js";
+import { rightAlign, visualRtl } from "./rtl.js";
 import { createTheme } from "./theme.js";
 
 const RULE_WIDTH = 40;
@@ -37,7 +37,7 @@ export function renderCalendarCard(
   ];
 
   if (!options.ascii) {
-    lines.push(rightAlign(rtl(view.monthName.ur), RULE_WIDTH));
+    lines.push(rightAlign(visualRtl(view.monthName.ur), RULE_WIDTH));
   }
   lines.push(gregorianRange(view, options.ascii));
 
@@ -82,7 +82,7 @@ export function renderCalendarPlain(
   ];
 
   if (!options.ascii) {
-    lines.push(rightAlign(rtl(view.monthName.ur), RULE_WIDTH));
+    lines.push(rightAlign(visualRtl(view.monthName.ur), RULE_WIDTH));
   }
   lines.push(gregorianRange(view, options.ascii));
 

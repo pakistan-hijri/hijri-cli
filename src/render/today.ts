@@ -3,7 +3,7 @@
 import type { TimeFormat } from "../domain/types.js";
 import type { TodayView } from "../domain/view.js";
 import { DISCLAIMER } from "../domain/view.js";
-import { rightAlign, rtl } from "./rtl.js";
+import { rightAlign, visualRtl } from "./rtl.js";
 import { createTheme } from "./theme.js";
 import { formatCountdown, formatTime, formatWeekday } from "./time.js";
 
@@ -94,7 +94,7 @@ function hijriLines(view: TodayView, ascii: boolean): string[] {
   if (ascii) {
     return [base];
   }
-  return [base, rightAlign(rtl(view.hijri.monthName.ur), RULE_WIDTH)];
+  return [base, rightAlign(visualRtl(view.hijri.monthName.ur), RULE_WIDTH)];
 }
 
 function nextLine(view: TodayView): string {
