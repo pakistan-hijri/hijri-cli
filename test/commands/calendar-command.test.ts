@@ -118,7 +118,7 @@ describe("runCalendar", () => {
     expect(writer.stdout).toContain("Jumada al-Thani 1448 AH");
     expect(writer.stdout).toContain("Mon Tue Wed Thu Fri Sat Sun");
     expect(writer.stdout).toContain("* today");
-    expect(writer.stdout).toContain("Confidence: confirmed");
+    expect(writer.stdout).toContain("[CONFIRMED]");
     expect(writer.stderr).toContain("No saved configuration");
     await dir.cleanup();
   });
@@ -130,8 +130,20 @@ describe("runCalendar", () => {
 
     expect(writer.stdout).toContain("Ramadan 1448 AH");
     expect(writer.stdout).toContain("Ramadan: Sehri ends at Fajr");
-    expect(writer.stdout).toContain("Confidence: mixed");
+    expect(writer.stdout).toContain("[MIXED]");
     expect(writer.stdout).toContain("Only confirmed dates are official.");
+    await dir.cleanup();
+  });
+
+  it("shows a 24-hour NOW strip for --24h", async () => {
+    const dir = await tempDir();
+    const writer = capturingWriter();
+    await runCalendar({ h24: true }, deps(dir.path, writer));
+
+    expect(writer.stdout).toContain("── NOW ");
+    expect(writer.stdout).toContain("12:16");
+    expect(writer.stdout).not.toContain("12:16 PM");
+    expect(writer.stdout).toContain("sunni_hanafi");
     await dir.cleanup();
   });
 

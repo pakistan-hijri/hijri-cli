@@ -1,8 +1,11 @@
-Hijri · Karachi
-────────────────────────────────────────
-Jumada al-Thani 1448 AH
+╭─ C A L E N D A R ────────────────────╮
+│ Karachi · Jumada al-Thani 1448 AH    │
+╰──────────────────────────────────────╯
                             ‭یناثلا یدامج‬
 28 May 2026 – 26 Jun 2026
+── NOW ─────────────────────────────────
+▸ Maghrib 5:45 PM · 1h 32m
+── JUMADA AL-THANI ─────────────────────
 Mon Tue Wed Thu Fri Sat Sun
               1 * 2   3   4
              28  29  30  31
@@ -14,5 +17,6 @@ Mon Tue Wed Thu Fri Sat Sun
  15  16  17  18  19  20  21
  26  27  28  29  30
  22  23  24  25  26
+── LEGEND ──────────────────────────────
 * today
-Confidence: confirmed
+[CONFIRMED]  sunni_hanafi

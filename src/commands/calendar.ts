@@ -1,9 +1,16 @@
 /** `hijri calendar`: resolve a Hijri month and choose one renderer. */
 
 import type { HijriApi } from "../api/client.js";
-import { resolveDisplayDate, todayInPakistan } from "../domain/calendar.js";
+import {
+  addDays,
+  resolveDisplayDate,
+  todayInPakistan,
+} from "../domain/calendar.js";
 import { buildMonthView } from "../domain/month.js";
+import { nextEvent } from "../domain/schedule.js";
 import type { CalendarFile } from "../domain/types.js";
+import { eventLabel } from "../domain/view.js";
+import type { NextView, StatusView } from "../domain/view.js";
 import {
   DataUnavailableError,
   OutOfRangeError,
@@ -124,9 +131,51 @@ export async function runCalendar(
     return;
   }
 
+  const statusRamadan = current.month === 9;
+  let statusNext: NextView | null = null;
+  const currentNext = nextEvent(now, civilPrayer.day, {
+    meta: civilPrayer.meta,
+    month: current.month,
+  });
+  if (currentNext !== null) {
+    statusNext = {
+      ...currentNext,
+      label: eventLabel(currentNext.id, statusRamadan, false),
+      isTomorrow: false,
+    };
+  } else {
+    const tomorrowDate = addDays(civilDate, 1);
+    const [tomorrowPrayer, tomorrowHijri] = await Promise.all([
+      deps.api.prayerDay(config.city, config.profile, tomorrowDate),
+      deps.api.calendarDay(tomorrowDate),
+    ]);
+    const tomorrowNext = nextEvent(now, tomorrowPrayer.day, {
+      meta: tomorrowPrayer.meta,
+      month: tomorrowHijri.month,
+    });
+    if (tomorrowNext !== null) {
+      statusNext = {
+        ...tomorrowNext,
+        label: eventLabel(
+          tomorrowNext.id,
+          tomorrowHijri.month === 9,
+          true,
+        ),
+        isTomorrow: true,
+      };
+    }
+  }
+  const status: StatusView = {
+    profile: config.profile,
+    next: statusNext,
+    ramadan: statusRamadan,
+  };
+
   const humanOptions = {
     color: deps.colorEnabled && flags.plain !== true,
     ascii: !deps.unicode,
+    format: config.timeFormat,
+    status,
   };
   deps.writer.out(
     flags.plain === true

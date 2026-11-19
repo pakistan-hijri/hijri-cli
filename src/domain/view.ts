@@ -44,6 +44,12 @@ export interface NextView {
   isTomorrow: boolean;
 }
 
+export interface StatusView {
+  profile: string;
+  next: NextView | null;
+  ramadan: boolean;
+}
+
 export interface BuildViewInput {
   city: { id: string; name: string };
   profile: string;

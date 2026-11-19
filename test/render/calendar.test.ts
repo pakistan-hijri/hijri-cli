@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildMonthView } from "../../src/domain/month.js";
 import type { MonthView } from "../../src/domain/month.js";
 import type { Confidence, HijriDay } from "../../src/domain/types.js";
+import type { StatusView } from "../../src/domain/view.js";
 import {
   renderCalendarCard,
   renderCalendarJson,
@@ -9,7 +10,12 @@ import {
 } from "../../src/render/calendar.js";
 import { hijriDay, readGolden, writeGolden } from "../support.js";
 
-const options = { color: false, ascii: false };
+const options = {
+  color: false,
+  ascii: false,
+  format: "12h" as const,
+  status: sampleStatus(),
+};
 
 describe("calendar renderers", () => {
   it("renders the month card", async () => {
@@ -17,6 +23,26 @@ describe("calendar renderers", () => {
       "calendar-card.txt",
       renderCalendarCard(sampleMonth({ today: "1448-06-02" }), options),
     );
+  });
+
+  it("formats the NOW strip with --24h", () => {
+    const card = renderCalendarCard(sampleMonth(), {
+      ...options,
+      format: "24h",
+    });
+
+    expect(card).toContain("── NOW ");
+    expect(card).toContain("Maghrib 17:45");
+    expect(card).not.toContain("5:45 PM");
+  });
+
+  it("omits the NOW strip when no status is available", () => {
+    const card = renderCalendarCard(sampleMonth(), {
+      ...options,
+      status: null,
+    });
+
+    expect(card).not.toContain("NOW");
   });
 
   it("renders the plain month", async () => {
@@ -47,7 +73,12 @@ describe("calendar renderers", () => {
   it("renders an ASCII fallback without Urdu", async () => {
     await expectGolden(
       "calendar-ascii.txt",
-      renderCalendarCard(sampleMonth(), { color: false, ascii: true }),
+      renderCalendarCard(sampleMonth(), {
+        color: false,
+        ascii: true,
+        format: "12h",
+        status: sampleStatus(),
+      }),
     );
   });
 
@@ -56,7 +87,7 @@ describe("calendar renderers", () => {
       sampleMonth({ confidence: ["confirmed", "predicted"] }),
       options,
     );
-    expect(card).toContain("Confidence: mixed");
+    expect(card).toContain("[MIXED]");
     expect(card).toContain("Only confirmed dates are official.");
   });
 
@@ -72,6 +103,20 @@ describe("calendar renderers", () => {
     expect(payload.data.days[0]?.gregorian).toBe("2026-05-28");
   });
 });
+
+function sampleStatus(): StatusView {
+  return {
+    profile: "sunni_hanafi",
+    ramadan: false,
+    next: {
+      id: "maghrib",
+      label: "Maghrib",
+      at: "2026-11-13T17:45:00+05:00",
+      minutes: 92,
+      isTomorrow: false,
+    },
+  };
+}
 
 function sampleMonth(input: {
   month?: number;

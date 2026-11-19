@@ -1,8 +1,19 @@
 /** Pure card, plain, and JSON renderers for the Hijri month view. */
 
 import type { MonthCell, MonthView } from "../domain/month.js";
+import type { StatusView } from "../domain/view.js";
+import type { TimeFormat } from "../domain/types.js";
+import {
+  badge,
+  crescent,
+  frame,
+  marker,
+  section,
+} from "./decor.js";
+import type { DecorStyle } from "./decor.js";
 import { rightAlign, visualRtl } from "./rtl.js";
 import { createTheme } from "./theme.js";
+import { formatCountdown, formatTime } from "./time.js";
 
 const RULE_WIDTH = 40;
 const CELL_WIDTH = 4;
@@ -21,6 +32,8 @@ const shortDate = new Intl.DateTimeFormat("en-GB", {
 export interface CalendarRenderOptions {
   color: boolean;
   ascii: boolean;
+  format: TimeFormat;
+  status: StatusView | null;
 }
 
 export function renderCalendarCard(
@@ -29,11 +42,13 @@ export function renderCalendarCard(
 ): string {
   const theme = createTheme(options.color);
   const separator = options.ascii ? " - " : " · ";
-  const rule = (options.ascii ? "-" : "─").repeat(RULE_WIDTH);
-  const lines = [
-    `${theme.bold("Hijri")}${separator}${view.city.name}`,
-    rule,
-    `${view.monthName.en} ${view.year} AH`,
+  const style: DecorStyle = { ascii: options.ascii, theme };
+  const lines: string[] = [
+    ...frame(
+      "CALENDAR",
+      `${view.city.name}${separator}${view.monthName.en} ${view.year} AH`,
+      style,
+    ),
   ];
 
   if (!options.ascii) {
@@ -42,9 +57,15 @@ export function renderCalendarCard(
   lines.push(gregorianRange(view, options.ascii));
 
   if (view.ramadan) {
-    lines.push(theme.accent(RAMADAN_NOTE));
+    lines.push(theme.accent(`${crescent(style)} ${RAMADAN_NOTE}`));
   }
 
+  if (options.status !== null) {
+    lines.push(section("NOW", style));
+    lines.push(statusLine(options.status, options, style));
+  }
+
+  lines.push(section(view.monthName.en.toUpperCase(), style));
   lines.push(weekdayHeader(options.ascii));
   for (const week of view.weeks) {
     lines.push(
@@ -61,10 +82,11 @@ export function renderCalendarCard(
     );
   }
 
+  lines.push(section("LEGEND", style));
   if (view.today !== null) {
     lines.push("* today");
   }
-  lines.push(`Confidence: ${view.confidence}`);
+  lines.push(`${badge(view.confidence.toUpperCase(), style)}  ${view.profile}`);
   if (view.confidence !== "confirmed") {
     lines.push(theme.warning(NOT_OFFICIAL));
   }
@@ -136,6 +158,20 @@ export function renderCalendarJson(view: MonthView): string {
     },
   };
   return `${JSON.stringify(payload, null, 2)}\n`;
+}
+
+function statusLine(
+  status: StatusView,
+  options: CalendarRenderOptions,
+  style: DecorStyle,
+): string {
+  if (status.next === null) {
+    return "Next: unavailable.";
+  }
+  const separator = options.ascii ? " - " : " · ";
+  const next = status.next;
+  const when = next.isTomorrow ? " tomorrow" : "";
+  return `${marker(style)} ${next.label}${when} ${formatTime(next.at, options.format)}${separator}${formatCountdown(next.minutes)}`;
 }
 
 function mark(cell: MonthCell): string {
