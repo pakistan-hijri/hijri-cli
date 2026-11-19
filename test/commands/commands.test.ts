@@ -30,6 +30,7 @@ const city = {
 
 function fakeApi(
   days: Record<string, ReturnType<typeof prayerDay>> = {},
+  calls: unknown[][] = [],
 ): Pick<
   HijriApi,
   "cities" | "requireCity" | "calendarDay" | "prayerDay"
@@ -46,7 +47,8 @@ function fakeApi(
         ? Promise.reject(new DataUnavailableError(`No Hijri day for ${date}.`))
         : Promise.resolve(day);
     },
-    prayerDay: (cityId: string, _profile: string, date: string) => {
+    prayerDay: (cityId: string, profile: string, date: string) => {
+      calls.push([cityId, profile, date]);
       const day = days[date] ?? (date === "2026-11-13" ? prayerDay(date) : undefined);
       return day === undefined
         ? Promise.reject(
@@ -91,10 +93,11 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
-    expect(writer.stdout).toContain("Hijri · Karachi");
+    expect(writer.stdout).toContain("H I J R I");
     expect(writer.stdout).toContain("2 Jumada al-Thani 1448 AH");
     expect(writer.stderr).toContain("No saved configuration");
     await dir.cleanup();
@@ -114,6 +117,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -144,6 +148,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -167,6 +172,7 @@ describe("runToday", () => {
         isTTY: false,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -190,6 +196,7 @@ describe("runToday", () => {
         isTTY: true,
         colorEnabled: false,
         unicode: true,
+        rtlMode: "visual",
       },
     );
 
@@ -198,7 +205,7 @@ describe("runToday", () => {
       city: "karachi",
       profile: "sunni_hanafi",
     });
-    expect(writer.stdout).toContain("Hijri · Karachi");
+    expect(writer.stdout).toContain("H I J R I");
     await dir.cleanup();
   });
 
@@ -216,9 +223,127 @@ describe("runToday", () => {
           isTTY: false,
           colorEnabled: false,
           unicode: true,
+          rtlMode: "visual",
         },
       ),
     ).rejects.toBeInstanceOf(UsageError);
+    await dir.cleanup();
+  });
+
+  it("formats card times in 24-hour form for --24h", async () => {
+    const dir = await tempDir();
+    const writer = capturingWriter();
+    await runToday(
+      { h24: true },
+      {
+        api: fakeApi(),
+        configPath: join(dir.path, "config.json"),
+        prompts: prompts(null),
+        writer,
+        now: () => new Date("2026-11-13T07:00:00.000Z"),
+        isTTY: false,
+        colorEnabled: false,
+        unicode: true,
+        rtlMode: "visual",
+      },
+    );
+
+    expect(writer.stdout).toContain("16:09");
+    expect(writer.stdout).not.toContain("4:09 PM");
+    await dir.cleanup();
+  });
+
+  it("uses one-off city and profile flags without saving them", async () => {
+    const dir = await tempDir();
+    const calls: unknown[][] = [];
+    const configPath = join(dir.path, "config.json");
+    await runToday(
+      { city: "karachi", profile: "shia_jafari" },
+      {
+        api: fakeApi({}, calls),
+        configPath,
+        prompts: prompts(null),
+        writer: capturingWriter(),
+        now: () => new Date("2026-11-13T07:00:00.000Z"),
+        isTTY: false,
+        colorEnabled: false,
+        unicode: true,
+        rtlMode: "visual",
+      },
+    );
+
+    expect(calls).toContainEqual(["karachi", "shia_jafari", "2026-11-13"]);
+    await expect(readFile(configPath, "utf8")).rejects.toThrow();
+    await dir.cleanup();
+  });
+
+  it("keeps the civil date for --midnight after Maghrib", async () => {
+    const dir = await tempDir();
+    const writer = capturingWriter();
+    await runToday(
+      { midnight: true },
+      {
+        api: fakeApi({
+          "2026-11-13": prayerDay("2026-11-13"),
+          "2026-11-14": prayerDay("2026-11-14"),
+        }),
+        configPath: join(dir.path, "config.json"),
+        prompts: prompts(null),
+        writer,
+        now: () => new Date("2026-11-13T13:00:00.000Z"),
+        isTTY: false,
+        colorEnabled: false,
+        unicode: true,
+        rtlMode: "visual",
+      },
+    );
+
+    expect(writer.stdout).toContain("2 Jumada al-Thani 1448 AH");
+    expect(writer.stdout).not.toContain("after Maghrib");
+    await dir.cleanup();
+  });
+
+  it("rejects conflicting date convention flags", async () => {
+    const dir = await tempDir();
+    await expect(
+      runToday(
+        { midnight: true, afterMaghrib: true },
+        {
+          api: fakeApi(),
+          configPath: join(dir.path, "config.json"),
+          prompts: prompts(null),
+          writer: capturingWriter(),
+          now: () => new Date("2026-11-13T07:00:00.000Z"),
+          isTTY: false,
+          colorEnabled: false,
+          unicode: true,
+          rtlMode: "visual",
+        },
+      ),
+    ).rejects.toBeInstanceOf(UsageError);
+    await dir.cleanup();
+  });
+
+  it("lets --json win over --plain", async () => {
+    const dir = await tempDir();
+    const writer = capturingWriter();
+    await runToday(
+      { json: true, plain: true },
+      {
+        api: fakeApi(),
+        configPath: join(dir.path, "config.json"),
+        prompts: prompts(null),
+        writer,
+        now: () => new Date("2026-11-13T07:00:00.000Z"),
+        isTTY: false,
+        colorEnabled: false,
+        unicode: true,
+        rtlMode: "visual",
+      },
+    );
+
+    expect(JSON.parse(writer.stdout)).toMatchObject({ ok: true });
+    expect(writer.stdout).not.toContain("Hijri ·");
     await dir.cleanup();
   });
 });

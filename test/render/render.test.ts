@@ -9,7 +9,12 @@ import { renderCard, renderPlain } from "../../src/render/today.js";
 import { sampleView } from "../fixtures.js";
 import { readGolden, writeGolden } from "../support.js";
 
-const options = { format: "12h" as const, color: false, ascii: false };
+const options = {
+  format: "12h" as const,
+  color: false,
+  ascii: false,
+  rtlMode: "visual" as const,
+};
 
 describe("time formatting", () => {
   it("formats 12-hour and 24-hour times in Asia/Karachi", () => {
@@ -115,6 +120,27 @@ describe("human renderers", () => {
       "card-ascii.txt",
       renderCard(sampleView(), { ...options, ascii: true }),
     );
+  });
+
+  it("right-aligns and visually orders the Urdu month name", () => {
+    const lines = renderCard(sampleView(), options).split("\n");
+    const urdu = lines.find((line) => line.includes("\u202d"));
+    expect(urdu?.endsWith("\u202dیناثلا یدامج\u202c")).toBe(true);
+    expect(urdu?.replace(/[\u202c\u202d]/gu, "").length).toBe(40);
+    expect(renderCard(sampleView(), { ...options, ascii: true })).not.toContain(
+      "\u202d",
+    );
+  });
+
+  it("emits logical Urdu for native RTL terminals", () => {
+    const lines = renderCard(sampleView(), {
+      ...options,
+      rtlMode: "logical",
+    }).split("\n");
+    const urdu = lines.find((line) => line.includes("\u2067"));
+
+    expect(urdu?.endsWith("\u2067جمادی الثانی\u2069")).toBe(true);
+    expect(urdu?.replace(/[\u2067\u2069]/gu, "").length).toBe(40);
   });
 
   it("renders the explicit-date note", async () => {

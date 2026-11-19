@@ -77,7 +77,18 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
 - **CLI-PREC-4** — WHEN both `--midnight` and `--after-maghrib` are supplied,
   THE SYSTEM SHALL exit `2` with a usage error.
 
-### 3.4 Dates and times
+### 3.4 Flag wiring
+
+- **CLI-FLG-1** — WHEN a flag is supplied either before or after a subcommand,
+  THE SYSTEM SHALL resolve it through one Commander program whose parsed values
+  are injected into the command handlers.
+- **CLI-FLG-2** — WHEN the same flag exists on the root and a subcommand, the
+  subcommand value SHALL win; otherwise the root value SHALL be used.
+- **CLI-FLG-3** — Every accepted flag, its precedence, and its mapped command
+  input SHALL be covered by deterministic tests that perform no network or
+  filesystem I/O.
+
+### 3.5 Dates and times
 
 - **CLI-DATE-1** — WHEN `--date` is supplied, THE SYSTEM SHALL require a valid
   `YYYY-MM-DD` date and SHALL exit `2` for anything else.
@@ -88,7 +99,7 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
 - **CLI-DATE-4** — `--date` SHALL be interpreted in `Asia/Karachi`, not the
   machine timezone.
 
-### 3.5 Today card
+### 3.6 Today card
 
 - **CLI-CARD-1** — The card SHALL show the city, Hijri day and month (English
   and Urdu), Hijri year, Gregorian date, and weekday.
@@ -111,15 +122,26 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
   `NO_COLOR` is unset and `--no-color` was not passed.
 - **CLI-CARD-9** — WHEN Unicode is unavailable, THE SYSTEM SHALL fall back to
   ASCII labels and plain rules; meaning SHALL never depend on colour.
+- **CLI-CARD-10** — The Urdu month name SHALL be rendered on its own line,
+  right-aligned to the card width. In `logical` mode it SHALL be wrapped in
+  RLI/PDI so terminals with bidi and shaping render it natively; in `visual`
+  mode its graphemes SHALL be reversed under LRO/PDF for terminals that ignore
+  bidi controls. The mode SHALL be auto-detected from the terminal environment
+  and overridable with `HIJRI_CLI_RTL`. The ASCII fallback SHALL omit that line.
+- **CLI-CARD-11** — The card SHALL use 40-column decorative frames, section
+  rules, a next-event marker, dotted leaders, and a confidence badge. The
+  Unicode variant SHALL fall back to ASCII equivalents when Unicode is
+  unavailable; colour SHALL remain optional. `--plain` SHALL NOT use these
+  decorations.
 
-### 3.6 Plain text
+### 3.7 Plain text
 
 - **CLI-PLAIN-1** — `--plain` SHALL print the same information as the card
   without box-drawing characters or colour.
 - **CLI-PLAIN-2** — `--plain` SHALL remain readable when piped and SHALL place
   diagnostics on stderr only.
 
-### 3.7 JSON
+### 3.8 JSON
 
 - **CLI-JSON-1** — `--json` SHALL print exactly one object to stdout and
   nothing else.
@@ -140,7 +162,7 @@ Requirement IDs use `CLI-<AREA>-<n>` and are referenced from `tasks.md`.
 - **CLI-JSON-6** — JSON SHALL use stable field names and ordering, two-space
   indentation, and a trailing newline.
 
-### 3.8 Errors and exit codes
+### 3.9 Errors and exit codes
 
 - **CLI-ERR-1** — stdout SHALL carry only results: the card, plain text, JSON
   success, help, or version.

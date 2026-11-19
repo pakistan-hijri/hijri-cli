@@ -3,6 +3,17 @@
 import type { TimeFormat } from "../domain/types.js";
 import type { TodayView } from "../domain/view.js";
 import { DISCLAIMER } from "../domain/view.js";
+import {
+  badge,
+  crescent,
+  frame,
+  leaders,
+  marker,
+  section,
+} from "./decor.js";
+import type { DecorStyle } from "./decor.js";
+import { rightAlign, visualRtl } from "./rtl.js";
+import type { RtlMode } from "./rtl.js";
 import { createTheme } from "./theme.js";
 import { formatCountdown, formatTime, formatWeekday } from "./time.js";
 
@@ -12,43 +23,50 @@ export interface RenderOptions {
   format: TimeFormat;
   color: boolean;
   ascii: boolean;
+  rtlMode: RtlMode;
 }
 
 export function renderCard(view: TodayView, options: RenderOptions): string {
   const theme = createTheme(options.color);
   const separator = options.ascii ? " - " : " · ";
-  const rule = (options.ascii ? "-" : "─").repeat(RULE_WIDTH);
+  const style: DecorStyle = { ascii: options.ascii, theme };
   const lines: string[] = [
-    `${theme.bold("Hijri")}${separator}${view.city.name}`,
-    rule,
-    formatWeekday(view.gregorian),
-    hijriLine(view, options.ascii),
+    ...frame(
+      "HIJRI",
+      `${view.city.name}${separator}${formatWeekday(view.gregorian)}`,
+      style,
+    ),
+    ...hijriLines(view, options.ascii, options.rtlMode),
   ];
 
   if (view.afterMaghrib) {
-    lines.push(
-      theme.dim(`Showing ${view.gregorian} (after Maghrib)`),
-    );
+    lines.push(theme.dim(`Showing ${view.gregorian} (after Maghrib)`));
   }
 
-  lines.push(nextLine(view));
+  lines.push(section("NEXT", style));
+  lines.push(`${marker(style)} ${nextLine(view)}`);
 
   if (view.sehriIftar !== null) {
     lines.push(
       theme.accent(
-        `Sehri ends ${formatTime(view.sehriIftar.sehriEnds, options.format)}${separator}Iftar ${formatTime(view.sehriIftar.iftar, options.format)}`,
+        `${crescent(style)} Sehri ends ${formatTime(view.sehriIftar.sehriEnds, options.format)}${separator}Iftar ${formatTime(view.sehriIftar.iftar, options.format)}`,
       ),
     );
   }
 
-  lines.push("");
+  lines.push(section("PRAYERS", style));
   for (const prayer of view.prayers) {
     lines.push(
-      `${prayer.label.padEnd(11)}${formatTime(prayer.at, options.format)}`,
+      leaders(
+        prayer.label,
+        theme.bold(formatTime(prayer.at, options.format)),
+        style,
+      ),
     );
   }
-  lines.push("");
-  lines.push(`Confidence: ${view.confidence}`);
+
+  lines.push(section("STATUS", style));
+  lines.push(`${badge(view.confidence.toUpperCase(), style)}  ${view.profile}`);
 
   if (view.confidence !== "confirmed") {
     lines.push(theme.warning("Only confirmed dates are official."));
@@ -63,7 +81,7 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   const lines = [
     `Hijri${separator}${view.city.name}`,
     formatWeekday(view.gregorian),
-    hijriLine(view, options.ascii),
+    ...hijriLines(view, options.ascii, options.rtlMode),
     `Confidence: ${view.confidence}`,
   ];
 
@@ -88,9 +106,19 @@ export function renderPlain(view: TodayView, options: RenderOptions): string {
   return `${lines.join("\n")}\n`;
 }
 
-function hijriLine(view: TodayView, ascii: boolean): string {
+function hijriLines(
+  view: TodayView,
+  ascii: boolean,
+  rtlMode: RtlMode,
+): string[] {
   const base = `${view.hijri.day} ${view.hijri.monthName.en} ${view.hijri.year} AH`;
-  return ascii ? base : `${base} · ${view.hijri.monthName.ur}`;
+  if (ascii) {
+    return [base];
+  }
+  return [
+    base,
+    rightAlign(visualRtl(view.hijri.monthName.ur, rtlMode), RULE_WIDTH),
+  ];
 }
 
 function nextLine(view: TodayView): string {

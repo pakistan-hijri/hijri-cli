@@ -18,13 +18,14 @@ Goals:
 - First-run onboarding for city and prayer profile.
 - Correct handling of the Islamic day boundary at Maghrib.
 - Ramadan-aware Sehri/Iftar and next-event countdown.
+- A Hijri month calendar that reuses the same published dates.
 - Offline tolerance through a bounded local cache.
 
 Non-goals:
 
 - Computing Hijri dates or prayer times locally.
 - Supporting cities or calculation methods the API does not publish.
-- A Ramadan month table, status line, or shell completions (milestone 03).
+- A dedicated status-line mode or shell completions (a later milestone).
 - Accounts, telemetry, or network writes.
 
 ## 2. Data source contract
@@ -86,15 +87,21 @@ flowchart TD
 
 The cache sits under the API calls in that diagram: every year file and index is
 read through `FileCache`, which can answer from disk or fall through to the
-network.
+network. `hijri calendar` branches after the clock step: it uses the resolved
+display date to pick a Hijri month, then feeds `domain/month.ts` and the calendar
+renderers. `commands/settings.ts` is shared by both commands so onboarding,
+precedence, and flag validation have one implementation.
 
 ## 5. Module map
 
 ```
 src/
-  cli.ts                 entry point: commander, flags, exit codes, wiring
+  cli.ts                 entry point: exit codes, dependency wiring
+  cli-program.ts         commander option definitions and flag precedence
   commands/
     today.ts             orchestrate data → view → renderer
+    calendar.ts          orchestrate a Hijri month view
+    settings.ts          shared config loading, onboarding, flag validation
     setup.ts             run onboarding, persist the result
     config.ts            show/update/clear saved configuration
   config/
@@ -112,12 +119,16 @@ src/
     calendar.ts          rollover, Hijri year age, date arithmetic helpers
     schedule.ts          prayer list, Sehri/Iftar offsets, next event
     view.ts              assemble the TodayView view model
+    month.ts             assemble the Hijri MonthView from calendar days
     types.ts             domain types shared by command/render
   render/
     writer.ts            Writer sink: stdout for results, stderr for diagnostics
     time.ts              ISO → 12/24-hour display, countdown text
     theme.ts             colour decisions, NO_COLOR aware
-    today.ts             card and plain renderers
+    rtl.ts               RTL mode detection, bidi controls, display width
+    decor.ts             40-column frames, sections, badges, leaders, glyphs
+    today.ts             card and plain renderers for the today view
+    calendar.ts          card, plain, and JSON renderers for the month view
     json.ts              stable JSON payload and JSON error payload
   onboard/
     prompts.ts           city/profile prompts; returns a config patch
@@ -208,9 +219,9 @@ then rename.
 
 ## 8. Output contract
 
-One resolved `TodayView` feeds three renderers. TTY gets the card; `--plain`
-gets the same content without decoration; `--json` gets the stable payload
-described in the README.
+One resolved `TodayView` — or `MonthView` for `hijri calendar` — feeds three
+renderers. TTY gets the card; `--plain` gets the same content without decoration;
+`--json` gets the stable payload described in the README.
 
 - **stdout** carries only the result (card, plain text, or JSON).
 - **stderr** carries warnings, progress, and JSON errors.
@@ -219,11 +230,22 @@ described in the README.
 - **Colour** is enabled only for a TTY, when `NO_COLOR` is unset and
   `--no-color` was not passed. Confidence and Ramadan labels carry meaning in
   words, so colour is never the only channel.
-- **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm`.
-- **Dates** are shown in English plus the API's Urdu month name.
+- **Times** default to 12-hour `h:mm AM/PM`; `--24h` switches to `HH:mm` in the
+  today card and in the calendar's NOW strip.
+- **Decoration** is card-only: 40-column frames, section rules, confidence
+  badges, dotted leaders, and a `▸` next-event marker, with ASCII substitutes
+  (`+--`, `--`, `[]`, `...`, `>`). `--plain` and `--json` stay undecorated.
+- **Dates** are shown in English plus the API's Urdu month name on a separate
+  right-aligned line. Bidi-capable terminals get logical RLI/PDI text; VS
+  Code/xterm and unknown terminals get reversed LRO/PDF text. `HIJRI_CLI_RTL`
+  overrides the detected mode; the ASCII fallback omits the Urdu line.
 - **Confidence** is always printed. Anything other than `confirmed` says it is
   not an official announcement.
-- **Disclaimer:** the card ends with a short calculated-times notice.
+- **Disclaimer:** the today card ends with a short calculated-times notice.
+- **Calendar:** the month grid is Monday-first, shows each Hijri day with its
+  Gregorian day, marks the resolved current day with `*`, carries a confidence
+  summary, and includes a NOW strip with the next prayer and active profile.
+  Ramadan months add a Sehri/Iftar note.
 
 ## 9. Failure modes
 
@@ -237,20 +259,23 @@ described in the README.
 | Date beyond published calendar years | Exit `4`, telling the user data is not published yet. |
 | Prayer year not published | Exit `3`, naming the city, profile, and year. |
 | Unknown city/profile | Exit `2`; list the accepted values. |
+| Invalid calendar month or year flag | Exit `2`; state the accepted range. |
+| Calendar year not published | Exit `4`; list `hijri_years` from the index. |
+| Calendar month has no published days | Exit `4`; say the month is not published yet. |
 | Invalid API payload | Exit `3`; report the route and validation failure, never print partial data. |
 | Corrupt config | Exit `2`; name the file and suggest `hijri config --clear`. |
 | Non-TTY with no config | Use defaults; warn on stderr that setup was skipped. |
-| Terminal lacks Unicode | Text fallback: ASCII labels and no card rule. |
+| Terminal lacks Unicode | ASCII decoration: `+--` frames, `--` sections, `>` marker; no Urdu line. |
 
 ## 10. Testing strategy
 
 - **Unit tests** cover date arithmetic, rollover, year selection, cache TTL and
   stale fallback, Sehri/Iftar offsets, next-event selection, config precedence,
-  and renderers.
+  every CLI flag and root/command precedence, and renderers.
 - **Fakes at the seams:** a `fetch` function, a clock, temporary directories,
   and a capturing writer. No live network in the suite.
 - **Golden files** freeze the card, plain, and JSON output, including a Ramadan
-  date and a non-confirmed date.
+  date, a non-confirmed date, and the calendar grid.
 - **Live smoke** is manual and recorded in `docs/dev-runs/`, never in CI.
 - **Coverage is not a target.** A behaviour named in a requirement has a test; a
   line without a behaviour does not need one.
@@ -262,6 +287,13 @@ in `specs/style-guide.md` §10. The standard library supplies HTTP, filesystem,
 hashing, internationalisation, and date arithmetic; no astronomy, HTTP client,
 or date library is added.
 
+Build-only: `esbuild` bundles the ESM source and dependencies into
+`dist/cli.cjs`; `@yao-pkg/pkg --sea` turns that bundle into the standalone
+`dist/hijri` executable for `node22-linux-x64`. The bundle is required because
+`pkg` cannot snapshot ESM-only packages such as `@clack/prompts`; `--sea` uses a
+full-ICU Node binary because standard `pkg` binaries lack `Intl.Segmenter`,
+which the RTL renderer needs. Neither tool ships in the published npm package.
+
 ## 12. Open decisions
 
 - **OD-00-1 — Onboarding fields.** *Resolved:* city and prayer profile. The
@@ -272,7 +304,8 @@ or date library is added.
 - **OD-00-3 — Ramadan presentation.** *Resolved:* inline labels on Fajr and
   Maghrib plus a highlighted Sehri/Iftar block.
 - **OD-00-4 — MVP scope.** *Resolved:* today's date, prayer times, and next
-  event. Month view, status line, and completions are milestone 03.
+  event. The month view shipped in milestone 03; card decoration shipped in
+  milestone 04. A dedicated status-line mode and completions remain deferred.
 - **OD-00-5 — Package identity.** *Resolved:* npm package `hijri-cli`, binary
   `hijri`.
 - **OD-00-6 — Non-interactive default.** *Resolved:* no prompt when stdin or
@@ -282,3 +315,8 @@ or date library is added.
 - **OD-00-8 — Sources on screen.** *Resolved:* source URLs are included in
   `--json` only. The card shows the confidence label; a future `--sources` flag
   can surface links without widening the default output.
+- **OD-00-9 — Standalone executable.** *Resolved:* `npm run pack:bin` builds a
+  Linux x64 binary at `dist/hijri` via an esbuild CJS bundle and `pkg --sea`.
+  `--sea` embeds full ICU for the RTL renderer. The npm package keeps
+  `dist/cli.js` as its bin entry; other platforms need a separate target
+  decision.

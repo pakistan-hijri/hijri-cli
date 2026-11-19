@@ -58,6 +58,11 @@ Commander runs with `exitOverride()` so every failure passes through one
 handler. Help and version map to exit `0`; commander usage errors map to exit
 `2`; anything else goes through `CliError`.
 
+The option tree lives in `src/cli-program.ts`; `src/cli.ts` only supplies the
+writer, clock, API factory, prompts, and command handlers. The factory is
+therefore parseable in tests with spies, which is how flag placement and
+precedence are verified without touching the network or filesystem.
+
 ## 3. Configuration
 
 ```ts
@@ -249,7 +254,8 @@ function formatWeekday(date: string): string;
 Hijri · Karachi
 ────────────────────────────────────────
 Friday, 13 November 2026
-2 Jumada al-Thani 1448 AH · جمادی الثانی
+2 Jumada al-Thani 1448 AH
+                            ⁨جمادی الثانی⁩
 Next: Maghrib in 2h 14m
 
 Fajr       5:28 AM
@@ -275,7 +281,15 @@ Rules:
 - Next line is omitted for an explicit date; instead the card prints
   `Date lookup: no countdown.`
 - `--no-color` and `NO_COLOR` produce the same text without ANSI codes.
-- The ASCII fallback omits the Urdu name and uses `-` rules.
+- The Urdu name is a separate line, right-aligned to the 40-column width. Two
+  modes are emitted: `logical` wraps the untouched text in RLI/PDI
+  (U+2067/U+2069) for terminals with bidi and Arabic shaping, while `visual`
+  reverses graphemes under LRO/PDF (U+202D/U+202C) for terminals that ignore
+  bidi controls. `detectRtlMode(env)` selects Konsole, iTerm2, Windows
+  Terminal, GNOME Terminal, and kitty as `logical`; VS Code/xterm and unknown
+  terminals stay `visual`. `HIJRI_CLI_RTL=logical|visual` overrides detection.
+  Display width ignores bidi controls, joiners, and combining marks.
+- The ASCII fallback omits the Urdu line and uses `-` rules.
 
 ### 7.3 Plain
 
@@ -355,3 +369,9 @@ got far enough to know that.
   `--24h` does not change the machine contract.
 - **OD-02-8 — Debug output.** *Resolved:* `HIJRI_CLI_DEBUG=1` adds a stack trace
   to stderr; it never changes stdout.
+- **OD-02-9 — RTL strategy.** *Revised:* auto-detect the terminal and choose
+  between native logical RTL and the visual fallback. The visual reversal is
+  still needed for VS Code/xterm, but it breaks contextual joining in
+  bidi-aware terminals such as Konsole; logical RLI/PDI fixes those terminals.
+  `HIJRI_CLI_RTL` forces a mode when detection is wrong. No single byte sequence
+  satisfies both terminal classes because shaping is the terminal's job.
