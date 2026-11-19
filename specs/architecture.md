@@ -287,6 +287,13 @@ in `specs/style-guide.md` §10. The standard library supplies HTTP, filesystem,
 hashing, internationalisation, and date arithmetic; no astronomy, HTTP client,
 or date library is added.
 
+Build-only: `esbuild` bundles the ESM source and dependencies into
+`dist/cli.cjs`; `@yao-pkg/pkg --sea` turns that bundle into the standalone
+`dist/hijri` executable for `node22-linux-x64`. The bundle is required because
+`pkg` cannot snapshot ESM-only packages such as `@clack/prompts`; `--sea` uses a
+full-ICU Node binary because standard `pkg` binaries lack `Intl.Segmenter`,
+which the RTL renderer needs. Neither tool ships in the published npm package.
+
 ## 12. Open decisions
 
 - **OD-00-1 — Onboarding fields.** *Resolved:* city and prayer profile. The
@@ -308,3 +315,8 @@ or date library is added.
 - **OD-00-8 — Sources on screen.** *Resolved:* source URLs are included in
   `--json` only. The card shows the confidence label; a future `--sources` flag
   can surface links without widening the default output.
+- **OD-00-9 — Standalone executable.** *Resolved:* `npm run pack:bin` builds a
+  Linux x64 binary at `dist/hijri` via an esbuild CJS bundle and `pkg --sea`.
+  `--sea` embeds full ICU for the RTL renderer. The npm package keeps
+  `dist/cli.js` as its bin entry; other platforms need a separate target
+  decision.

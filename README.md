@@ -2,143 +2,86 @@
 
 Today's Hijri date and prayer times for Pakistan, in your terminal.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-`hijri-cli` is a small, scriptable CLI built on
-[`hijri-api`](https://github.com/pakistan-hijri/hijri-api). It shows the Hijri
-date, the day's prayer times, the next prayer, and — during Ramadan — Sehri and
-Iftar. Dates and times come from a static JSON API that records confirmed month
-starts and calculates prayer times for Pakistani cities.
-
-This project is partly inspired by [Ramadan CLI](https://github.com/ahmadawais/ramadan-cli) by Ahmad Awais.
+`hijri-cli` reads the published [`hijri-api`](https://github.com/pakistan-hijri/hijri-api) data and prints a readable card or stable JSON. It shows the current Hijri date, the day's prayer times, the next prayer, and Sehri/Iftar labels during Ramadan.
 
 ## Install
 
 ```sh
 npx hijri-cli
+```
 
-# or install globally
+Or install globally:
+
+```sh
 npm install -g hijri-cli
 hijri
 ```
 
 Requires Node 22 or newer.
 
-## First run
-
-The first interactive run asks for two things:
-
-1. **City** — one of the cities published by `hijri-api` (`karachi`, `lahore`,
-   `peshawar`, `quetta` today).
-2. **Prayer profile** — `sunni_hanafi` (default), `sunni_asr1`, or
-   `shia_jafari`.
-
-The answers are saved to `~/.config/hijri-cli/config.json` (or
-`$XDG_CONFIG_HOME/hijri-cli/config.json`). Re-run the flow with `hijri setup`.
-
-Non-interactive runs with no saved config use Karachi and the Hanafi profile
-without prompting, so scripts never hang.
-
-## Usage
+## Quick start
 
 ```sh
-hijri                          # today's date and prayer times
-hijri --city lahore            # one-off city, does not change saved config
-hijri --profile shia_jafari    # one-off prayer profile
-hijri --date 2026-03-01        # look up a specific civil date
-hijri calendar                 # current Hijri month grid
-hijri calendar --month 9       # a specific Hijri month
-hijri calendar --year 1449     # a full Hijri year's month
-hijri --midnight               # do not roll the Hijri date over at Maghrib
-hijri --24h                    # 24-hour times
-hijri --json                   # stable JSON for scripts
-hijri --plain                  # no card or colours
-hijri setup                    # change city and profile
-hijri config --show            # print the saved configuration
-hijri config --clear           # remove saved configuration
+hijri
+hijri --city lahore --24h
+hijri calendar
+hijri calendar --month 9 --year 1448
+hijri --json
+hijri setup
 ```
 
-### Ramadan
+On first interactive run, `hijri` asks for a city and prayer profile. Non-interactive runs use Karachi and `sunni_hanafi` without prompting, so scripts never hang. Change saved settings later with `hijri setup` or `hijri config --city karachi --profile sunni_asr1`.
 
-During Ramadan the card labels Fajr as **Sehri ends** and Maghrib as **Iftar**,
-adds a highlighted Sehri/Iftar line, and makes the next event a Sehri or Iftar
-countdown. Outside Ramadan those rows read as ordinary Fajr and Maghrib.
+## Commands
 
-### Calendar
-
-`hijri calendar` prints the Hijri month as a Monday-first grid. Each week shows
-the Hijri day numbers above the matching Gregorian day numbers, with the full
-Gregorian range in the header. The resolved current day is marked `*` and
-Ramadan months explain that Sehri ends at Fajr and Iftar at Maghrib. A NOW strip
-shows the next event, its time, and the active prayer profile. Dates still come
-from `hijri-api`; the CLI computes no calendar of its own.
-
-```text
-╭─ C A L E N D A R ────────────────────╮
-│ Karachi · Jumada al-Thani 1448 AH    │
-╰──────────────────────────────────────╯
-                            ⁨جمادی الثانی⁩
-12 Nov 2026 – 11 Dec 2026
-── NOW ─────────────────────────────────
-▸ Dhuhr 12:17 · 1h 26m
-── JUMADA AL-THANI ─────────────────────
-...
-── LEGEND ──────────────────────────────
-* today
-[MIXED]  shia_jafari
-Only confirmed dates are official.
-```
-
-```sh
-hijri calendar --month 9 --year 1448 --json
-hijri calendar --24h --profile shia_jafari
-```
-
-`--24h` changes the NOW strip's time and `--profile` is shown in the legend;
-neither changes calendar dates or JSON. `--plain` drops the card decoration, and
-a month whose dates are not all confirmed carries the same warning as the today
-view. All dates come from the published calendar files.
-
-### Date convention
-
-By default the Islamic day rolls over at Maghrib: after today's Maghrib the CLI
-shows the next Hijri date. Use `--midnight` for the civil-calendar date that
-printed calendars use. An explicit `--date` is always a civil-day lookup.
-
-Every date carries the API's confidence level:
-
-| Level | Meaning |
+| Command | Purpose |
 |---|---|
-| `confirmed` | A verified month-start record exists |
-| `estimated` | A past month with no verified entry |
-| `predicted` | A future month |
-| `unconfirmed` | The last day, pending a sighting announcement |
+| `hijri` | Today's date, prayer times, and next event |
+| `hijri calendar` | Current Hijri month grid |
+| `hijri setup` | Choose city and prayer profile |
+| `hijri config --show` | Print effective configuration |
+| `hijri config --city <id> --profile <id>` | Update saved configuration |
+| `hijri config --clear` | Remove saved configuration |
 
-Only `confirmed` dates are official. The CLI says so on screen and includes the
-same status in `--json`.
+## Flags
+
+| Flag | Effect |
+|---|---|
+| `--city <id>` | One-off city lookup |
+| `--profile <id>` | One-off prayer profile: `sunni_hanafi`, `sunni_asr1`, or `shia_jafari` |
+| `--date <YYYY-MM-DD>` | Look up a civil date; no countdown is shown |
+| `--midnight` | Use the civil date instead of rolling over at Maghrib |
+| `--after-maghrib` | Roll over at Maghrib (default) |
+| `--24h` | Use 24-hour times in human output |
+| `--json` | Print machine-readable JSON |
+| `--plain` | Print undecorated text without colour |
+| `--no-color` | Disable colour |
+| `--no-cache` | Bypass cache reads and writes |
+| `--offline` | Use cached data only |
+
+`--json` wins over `--plain`. One-off flags never change saved configuration.
+
+## Calendar
+
+`hijri calendar` prints a Monday-first Hijri month grid with Gregorian day numbers, the current day marked `*`, a confidence summary, and a NOW strip with the next event and active profile. `--24h` changes the NOW strip's time; `--profile` changes the legend. Neither changes calendar dates or JSON.
+
+During Ramadan, Fajr is labelled **Sehri ends**, Maghrib is labelled **Iftar**, and the next event uses those labels.
 
 ## Configuration
 
-| Setting | Flag | Environment | Default |
-|---|---|---|---|
-| City | `--city` | — | saved, then `karachi` |
-| Prayer profile | `--profile` | — | saved, then `sunni_hanafi` |
-| Date convention | `--midnight` / `--after-maghrib` | — | saved, then `after-maghrib` |
-| Time format | `--24h` | — | saved, then `12h` |
+Settings resolve in this order: flag, saved config, default. The saved file is `~/.config/hijri-cli/config.json`, or `$XDG_CONFIG_HOME/hijri-cli/config.json`.
 
-Precedence is **flag > saved config > default**. One-off flags never overwrite
-the saved configuration.
-
-Data is cached under `~/.cache/hijri-cli/` (or `$XDG_CACHE_HOME`). When the
-network is unavailable, the CLI falls back to stale cache with a warning on
-stderr. `--no-cache` bypasses the cache; `--offline` forbids network access.
+Data is cached under `~/.cache/hijri-cli/`, or `$XDG_CACHE_HOME/hijri-cli/`. When the network is unavailable, the CLI falls back to stale cache with a warning on stderr.
 
 Environment overrides:
 
-- `HIJRI_API_BASE_URL` — point at a local or alternate API build.
-- `HIJRI_CLI_CONFIG_DIR` — use a different config directory.
-- `HIJRI_CLI_CACHE_DIR` — use a different cache directory.
-- `NO_COLOR` — disable colour.
+| Variable | Purpose |
+|---|---|
+| `HIJRI_API_BASE_URL` | Use a different API base URL |
+| `HIJRI_CLI_CONFIG_DIR` | Use a different config directory |
+| `HIJRI_CLI_CACHE_DIR` | Use a different cache directory |
+| `HIJRI_CLI_RTL` | Force `logical` or `visual` Urdu rendering |
+| `NO_COLOR` | Disable colour |
 
 ## JSON output
 
@@ -174,77 +117,22 @@ Environment overrides:
 }
 ```
 
-`hijri calendar --json` uses the same envelope with a month payload:
-
-```json
-{
-  "ok": true,
-  "data": {
-    "city": "karachi",
-    "profile": "sunni_hanafi",
-    "year": 1448,
-    "month": 9,
-    "monthName": { "en": "Ramadan", "ur": "رمضان" },
-    "ramadan": true,
-    "confidence": "predicted",
-    "today": null,
-    "days": [
-      {
-        "hijri": "1448-09-01",
-        "day": 1,
-        "gregorian": "2027-02-08",
-        "confidence": "predicted"
-      }
-    ]
-  }
-}
-```
-
-Failures print an `{ "ok": false, "error": { "code", "message" } }` object to
-stderr and exit non-zero.
+`hijri calendar --json` uses the same envelope with a `days` array. Failures print an `{ "ok": false, "error": { "code", "message" } }` object to stderr and exit non-zero. Diagnostics never go to stdout.
 
 ## Accuracy
 
-Dates are as reliable as their confidence level. Prayer times are **calculated,
-not observed**: they are guidance, and your local mosque or imambargah is the
-final authority. Sehri and Iftar use the same Fajr and Maghrib calculations with
-the profile's precaution offsets.
+Dates carry the API's confidence level:
 
-The data contract, confidence model, source record, and audit trail live in
-[`hijri-api`](https://github.com/pakistan-hijri/hijri-api). This CLI does not
-maintain a second copy of any date or time.
+| Level | Meaning |
+|---|---|
+| `confirmed` | A verified month-start record exists |
+| `estimated` | A past month with no verified entry |
+| `predicted` | A future month |
+| `unconfirmed` | The last day, pending a sighting announcement |
 
-## Development
+Only `confirmed` dates are official. Prayer times are calculated, not observed; they are guidance, and your local mosque or imambargah is the final authority. Sehri and Iftar use the same Fajr and Maghrib calculations with the profile's precaution offsets.
 
-Run the local TypeScript entry point with `npm run dev --` followed by any
-flags:
-
-```sh
-npm run dev -- --city lahore --24h
-npm run dev -- calendar --month 9 --year 1448 --json
-```
-
-npm prints its own banner to stdout. When piping JSON, call `tsx` or the built
-CLI directly so stdout carries only the result:
-
-```sh
-npx tsx src/cli.ts --offline --json
-npm run build && node dist/cli.js calendar --json
-```
-
-## Roadmap
-
-- [x] `00` — Repository scaffolding and project standards
-- [x] `01` — Data client: API, cache, Hijri resolution, prayer schedule
-- [x] `02` — CLI experience: onboarding, today view, Ramadan, JSON
-- [x] `03` — Hijri month calendar
-- [x] `04` — Presentation: decorated today and calendar cards, NOW strip
-- [ ] `05` — Standalone status line and shell completions
-
-Design rationale, coding standards, and acceptance criteria live in
-[`specs/`](./specs/). Contributors should start with
-[`CONTRIBUTING.md`](./CONTRIBUTING.md); AI coding agents should start with
-[`AGENTS.md`](./AGENTS.md).
+The CLI does not maintain a second copy of any date or time.
 
 ## License
 
